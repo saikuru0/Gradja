@@ -145,7 +145,30 @@ Nalepiej skorzystać ze schematu jak zrobiono pozostałe linki:
 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/url">Nazwa</a>
 ```
 
+Polecam również poczytać o [Django Templates](https://docs.djangoproject.com/en/4.2/ref/templates/builtins/)
 
+### Filtrowanie:
 
+Tworząc widoki należy starać się aby dostęp do nich miały osoby uprzywilejowane. Poza standardami, jakimi daje nam Django, zostały stworzone funkcje i dekoratory aby filtrować użytkowników i dawać im dostęp (też pokazywać linki) do tego, co mogą. 
 
+Dla szablonów stworzono filter has_group() znajdujący się w templatetags/poll_extras.py. Pozwala on sprawdzić, czy użytkownik pochodzi z danej grupy (najpierw sprawdzić czy jest zalogowany):
+```
+{% if request.user|has_group:"teacher" %} 
+    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_grades">Dodaj oceny</a>
+{% endif %}
+```
+
+Do widoków stworzono dwa dekoratory (w pliku decorators.py): @not_logged_in_required , @user_with_required_group():
+1. @not_logged_in_required - Tag wymaga, aby nikt nie był zalogowany:
+```
+@not_logged_in_required
+def widok(request):
+    ...
+```
+2. @user_with_required_group() - Tag wymaga, aby użytkownik pochodził z jednej z konkretnych grup:
+```
+user_with_required_group('teacher', 'admin')
+def widok(request):
+    ...
+```
 
