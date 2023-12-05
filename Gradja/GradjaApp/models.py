@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
@@ -11,17 +13,29 @@ class Roles(models.Model):
         db_table = "Roles"
         verbose_name_plural = "Roles"
 
-class Users(models.Model):
-    userId = models.IntegerField(primary_key = True)
-    name = models.CharField(max_length=32)
-    surname = models.CharField(max_length=32)
-    role = models.ForeignKey(Roles, on_delete= models.CASCADE)
+class Users(AbstractUser):
+    # userId = models.OneToOneField(User, on_delete=models.CASCADE)
+    # name = models.CharField(max_length=32, null=True)
+    # surname = models.CharField(max_length=32, null=True)
+    # role = models.ForeignKey(Roles, null=True, on_delete= models.CASCADE)
 
-    studentParent = models.ManyToManyField('self', related_name='StudentParent', symmetrical=False)
+    # studentParent = models.ManyToManyField('self', null=True, related_name='StudentParent', symmetrical=False)
+    studentParent = models.ManyToManyField('self', through='StudentParent', symmetrical=False)
 
     class Meta:
         db_table = "Users"
         verbose_name_plural = "Users"
+
+
+class StudentParent(models.Model):
+    studentId = models.ForeignKey(Users, on_delete = models.CASCADE)
+    parentId = models.ForeignKey(Users, on_delete = models.CASCADE, related_name= "parentId")
+
+    class Meta:
+        db_table = "StudentParent"
+        verbose_name_plural = "StudentParent"
+
+
 
 class Mails(models.Model):
     mailId = models.IntegerField(primary_key = True)
