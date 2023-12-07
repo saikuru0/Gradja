@@ -30,3 +30,10 @@ def signup(request):
 @user_with_required_group('teacher')
 def set_grades(request):
     return render(request, 'set_grades.html', {})
+
+
+@user_with_required_group('admin')
+def set_gradetype(request):
+    # ...
+    return render(request, "set_gradetype.html", {})
+
