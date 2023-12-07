@@ -3,5 +3,23 @@
 {% block title %} Set GradeType {% endblock %}
 
 {% block content %}
-
+    <h2>Grades Table</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in gradetypes %}
+                <tr>
+                    <td>{{ grade.typeName }}</td>
+                    <td>{{ grade.weight }}</td>
+                    <td><button  class="btn btn-primary" style="background-color:blue">Zmień</button></td>
+                    <td><button  class="btn btn-primary" style="background-color:red">Usuń</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

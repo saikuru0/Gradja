@@ -6,6 +6,8 @@ from GradjaApp.forms import SignUpForm
 from .decorators import not_logged_in_required, user_with_required_group
 
 # Create your views here.
+from .models import GradeType
+
 
 def home(request):
     return render(request, "home.html", {})
@@ -34,6 +36,7 @@ def set_grades(request):
 
 @user_with_required_group('admin')
 def set_gradetype(request):
-    # ...
-    return render(request, "set_gradetype.html", {})
+
+    gradetypes = GradeType.objects.all();
+    return render(request, "set_gradetype.html", {'gradetypes' : gradetypes})
 
