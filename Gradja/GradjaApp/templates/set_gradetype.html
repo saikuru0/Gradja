@@ -3,7 +3,11 @@
 {% block title %} Set GradeType {% endblock %}
 
 {% block content %}
+
     <h2>Grades Table</h2>
+
+    <a href="{% url 'add_gradetype' %}" class="btn btn-success">Add</a>
+
     <table class="table">
         <thead>
             <tr>
@@ -17,9 +21,16 @@
                     <td>{{ grade.typeName }}</td>
                     <td>{{ grade.weight }}</td>
                     <td><button  class="btn btn-primary" style="background-color:blue">Zmień</button></td>
-                    <td><button  class="btn btn-primary" style="background-color:red">Usuń</button></td>
+                    <td>
+                        <form method="post" action="{% url 'set_gradetype' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="gradetypeId" value="{{ grade.typeId }}">
+                            <button type="submit" class="btn btn-primary delete-btn" style="background-color: red">Usuń</button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
 {% endblock %}

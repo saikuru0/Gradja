@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %} Tytul strony {% endblock %}
+
+{% block content %}
+    <h2>Dodaj nowy rodzaj oceny</h2>
+
+    <form method="post" action="{% url 'add_gradetype' %}">
+        {% csrf_token %}
+        {{ formularz.as_p }}
+        <button type="submit">Dodaj</button>
+    </form>
+{% endblock %}
