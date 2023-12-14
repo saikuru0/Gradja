@@ -21,3 +21,7 @@ class delGradetypeForm(forms.Form):
 class addGradetypeForm(forms.Form):
     typeName = forms.CharField(max_length=100, label='Nazwa')
     weight = forms.DecimalField(label='Wartość')
+
+class editGradetypeForm(forms.Form):
+    typeName = forms.CharField(max_length=100, label='Nazwa')
+    weight = forms.DecimalField(label='Wartość')

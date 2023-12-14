@@ -8,7 +8,7 @@ from .decorators import not_logged_in_required, user_with_required_group
 
 # Create your views here.
 from .models import GradeType
-from .forms import delGradetypeForm
+from .forms import delGradetypeForm, editGradetypeForm
 from .forms import addGradetypeForm
 
 
@@ -69,5 +69,21 @@ def add_gradetype(request):
     context = {'form': form}
     return render(request, "add_gradetype.html", context)
 
+def edit_gradetype(request, gradetype_id):
+    gradetype = get_object_or_404(GradeType, typeId=gradetype_id)
 
+    if request.method == 'POST':
+        form = editGradetypeForm(request.POST)
+        if form.is_valid():
+            gradetype.typeName = form.cleaned_data['typeName']
+            gradetype.weight = form.cleaned_data['weight']
+            gradetype.save()
 
+            # Przekieruj gdzieś po zakończeniu edycji
+            return redirect('set_gradetype')
+
+    else:
+        form = editGradetypeForm(initial={'typeName': gradetype.typeName, 'weight': gradetype.weight})
+
+    context = {'form': form, 'gradetype': gradetype}
+    return render(request, "edit_gradetype.html", context)

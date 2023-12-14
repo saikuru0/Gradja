@@ -20,7 +20,7 @@
                 <tr>
                     <td>{{ grade.typeName }}</td>
                     <td>{{ grade.weight }}</td>
-                    <td><button  class="btn btn-primary" style="background-color:blue">Zmień</button></td>
+                    <td><a href="{% url 'edit_gradetype' gradetype_id=grade.typeId %}" class="btn btn-primary">Zmień</a></td>
                     <td>
                         <form method="post" action="{% url 'set_gradetype' %}">
                             {% csrf_token %}

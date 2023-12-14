@@ -5,7 +5,7 @@
 {% block content %}
     <h2>Edytuj rodzaj oceny</h2>
 
-    <form method="post" action="{% url 'edit_gradetype' gradetype.id %}" class="gradetype-form">
+    <form method="post" action="{% url 'edit_gradetype' gradetype.typeId %}" class="gradetype-form">
         {% csrf_token %}
         <div class="form-field">
             {{ form.typeName.label_tag }}
