@@ -4,6 +4,9 @@ from GradjaApp.models import Users
 
 
 # Forma do rejestracji
+
+
+
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
@@ -16,4 +19,5 @@ class delGradetypeForm(forms.Form):
     gradetypeId = forms.IntegerField(widget=forms.HiddenInput())
 
 class addGradetypeForm(forms.Form):
-    field1 = forms.CharField(max_length=100)
+    typeName = forms.CharField(max_length=100, label='Nazwa')
+    weight = forms.DecimalField(label='Wartość')

@@ -53,9 +53,21 @@ def add_gradetype(request):
     if request.method == 'POST':
         form = addGradetypeForm(request.POST)
         if form.is_valid():
-            # Obsługa poprawnego wypełnienia formularza
-            # (np. zapis danych do bazy danych)
-            return redirect('sukces')
+            # Jeśli formularz jest poprawny, pobierz dane z formularza
+            type_name = form.cleaned_data['typeName']
+            weight = form.cleaned_data['weight']
+
+            # Stwórz nowy obiekt modelu GradeType i zapisz go w bazie danych
+            new_grade_type = GradeType(typeName=type_name, weight=weight)
+            new_grade_type.save()
+
+            return redirect('set_gradetype')
+
     else:
         form = addGradetypeForm()
-    return render(request, "add_gradetype.html", {'form' : form})
+
+    context = {'form': form}
+    return render(request, "add_gradetype.html", context)
+
+
+
