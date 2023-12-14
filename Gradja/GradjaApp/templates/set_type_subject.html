@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %} Set SubjectType {% endblock %}
+
+{% block content %}
+
+    <h2 style="margin-bottom: 30px;">Subject Types Table</h2>
+
+    <a style="margin-bottom: 30px;" href="{% url 'add_subjecttype' %}" class="btn btn-success">Add new</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in subject_types %}
+                <tr>
+                    <td>{{ subject.typeName }}</td>
+                    <td>{{ subject.description }}</td>
+                    <td><a href="{% url 'edit_subject_type' subject.typeId %}" class="btn btn-primary" style="background-color:blue">Edit</a>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'set_type_subject' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="typeId" value="{{ subject.typeId }}">
+                            <button type="submit" class="btn btn-primary delete-btn" style="background-color: red">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
