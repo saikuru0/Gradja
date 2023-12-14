@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from .models import Mails
 
 from GradjaApp.forms import SignUpForm, MailForm
 from .decorators import not_logged_in_required, user_with_required_group
@@ -47,4 +48,5 @@ def send_mail(request):
     return render(request, 'send_mail.html', {'form': form})
 
 def inbox(request):
-    return render(request, 'inbox.html')
+    user_mails = Mails.objects.filter(toId=request.user)
+    return render(request, 'inbox.html', {'user_mails': user_mails})
