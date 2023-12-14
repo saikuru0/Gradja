@@ -1,5 +1,5 @@
 IMG = gradja-img
-CONT = gradia
+CONT = gradja
 APP = Gradja
 
 all:
