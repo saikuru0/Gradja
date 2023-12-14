@@ -3,13 +3,24 @@
 {% block content %}
     <h2 class="display-4">Skrzynka</h2>
     {% if user_mails %}
+        <h5>Odebrane</h5>
         <ul>
             {% for mail in user_mails %}
                 <li>{{ mail.topic }} - {{ mail.fromId }} ({{ mail.sendDate }})</li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>Brak wiadomości :)</p>
+        <p>Nikt jeszcze do ciebie nie pisał :3</p>
+    {% endif %}
+    {% if sent_mails %}
+        <h5>Wysłane</h5>
+        <ul>
+            {% for mail in sent_mails %}
+                <li>{{ mail.topic }} - {{ mail.fromId }} ({{ mail.sendDate }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Jescze nikt nie otrzymał twoich wiadomości :3</p>
     {% endif %}
 {% endblock %}
 

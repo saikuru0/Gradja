@@ -49,4 +49,5 @@ def send_mail(request):
 
 def inbox(request):
     user_mails = Mails.objects.filter(toId=request.user)
-    return render(request, 'inbox.html', {'user_mails': user_mails})
+    sent_mails = Mails.objects.filter(fromId=request.user)
+    return render(request, 'inbox.html', {'user_mails': user_mails, 'sent_mails': sent_mails})
