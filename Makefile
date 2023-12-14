@@ -15,6 +15,9 @@ migrations:
 	docker exec -d $(CONT) python manage.py makemigrations
 	docker exec -d $(CONT) python manage.py migrate
 
+su:
+	docker exec -it $(CONT) python manage.py createsuperuser
+
 remove:
 	docker container rm $(CONT)
 
@@ -22,5 +25,5 @@ restart:
 	docker stop $(CONT)
 	docker start $(CONT)
 
-.PHONY: all build create remove restart
+.PHONY: all build create migrations su remove restart
 .SILENT: all
