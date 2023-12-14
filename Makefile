@@ -9,7 +9,7 @@ build:
 	docker build -t $(IMG) .
 
 create:
-	docker run --name=$(CONT) -p 8000:8000 -v ./$(APP):/usr/src/app -d $(IMG)
+	docker run -t --name=$(CONT) -p 8000:8000 -v ./$(APP):/usr/src/app -d $(IMG)
 
 migrations:
 	docker exec -d $(CONT) python manage.py makemigrations
