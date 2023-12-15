@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2 class="display-4">Tworzenie wiadomości</h2>
+    <form method="post" action="{% url 'send_mail' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Wyślij</button>
+    </form>
+{% endblock %}

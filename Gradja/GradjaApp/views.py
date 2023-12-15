@@ -2,15 +2,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from .models import Mails
 
-from GradjaApp.forms import SignUpForm
-from .decorators import not_logged_in_required, user_with_required_group
-
-# Create your views here.
+from GradjaApp.forms import SignUpForm, MailForm
+from .forms import AddClassForm, AssignStudentsForm
 from .models import GradeType
 from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice
 from .forms import addGradetypeForm
 
+from .decorators import not_logged_in_required, user_with_required_group
+
+# Create your views here.
 
 def home(request):
     return render(request, "home.html", {})
@@ -88,7 +91,6 @@ def edit_gradetype(request, gradetype_id):
     context = {'form': form, 'gradetype': gradetype}
     return render(request, "edit_gradetype.html", context)
 
-
 def grade_view(request):
     return render(request, 'grades.html', {})
 
@@ -102,3 +104,49 @@ def add_grade_subject_choice(request):
         form = SubjectChoice()
 
     return render(request, 'grades_choice.html', {'form': form})
+
+def send_mail(request):
+    if request.method == 'POST':
+        form = MailForm(request.POST)
+        if form.is_valid():
+            mail = form.save(commit=False)
+            mail.fromId = request.user
+            mail.sendDate = timezone.now()
+            mail.save()
+            return redirect('inbox')
+    else:
+        form = MailForm()
+
+    return render(request, 'send_mail.html', {'form': form})
+
+def inbox(request):
+    user_mails = Mails.objects.filter(toId=request.user)
+    sent_mails = Mails.objects.filter(fromId=request.user)
+    return render(request, 'inbox.html', {'user_mails': user_mails, 'sent_mails': sent_mails})
+
+
+
+@user_with_required_group('admin')
+def add_class(request):
+    if request.method == 'POST':
+        form = AddClassForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('add_class')
+    else:
+        form = AddClassForm()
+
+    return render(request, 'add_class.html', {'form': form})
+
+
+@user_with_required_group('admin')
+def assign_students(request):
+    if request.method == 'POST':
+        form = AssignStudentsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('assign_students')
+    else:
+        form = AssignStudentsForm()
+
+    return render(request, 'assign_students.html', {'form': form})

@@ -51,6 +51,8 @@ Załączony `Makefile` pozwala na zarządzanie obrazem i kontenerem Docker, po o
 Usage:
     make build - builds the Docker image
     make create - creates and runs the Docker container
+    make migrations - applies mandatory migrations
+    make su - enters superuser creation in running container
     make remove - removes the running Docker container
     make restart - restarts the running Docker container
 ```
@@ -61,11 +63,16 @@ Usage:
 # with make
 make build
 make create
+make migrations
+make su
 make restart # to manually apply code changes
 
 # without make
 docker build -t gradja-img .
 docker run --name=gradja =p 8000:8000 -v ./Gradja:/usr/src/app -d gradja-img
+docker exec python manage.py makemigrations
+docker exec python manage.py migrate
+docker exec -it python manage.py createsuperuser
 docker stop gradja; docker start gradja # to manually apply code changes
 ```
 
