@@ -2,8 +2,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from .models import Mails
 
-from GradjaApp.forms import SignUpForm
+from GradjaApp.forms import SignUpForm, MailForm
 from .decorators import not_logged_in_required, user_with_required_group
 
 # Create your views here.
@@ -35,7 +37,6 @@ def signup(request):
 @user_with_required_group('teacher')
 def set_grades(request):
     return render(request, 'set_grades.html', {})
-
 
 @user_with_required_group('admin')
 def set_gradetype(request):
@@ -87,3 +88,22 @@ def edit_gradetype(request, gradetype_id):
 
     context = {'form': form, 'gradetype': gradetype}
     return render(request, "edit_gradetype.html", context)
+
+def send_mail(request):
+    if request.method == 'POST':
+        form = MailForm(request.POST)
+        if form.is_valid():
+            mail = form.save(commit=False)
+            mail.fromId = request.user
+            mail.sendDate = timezone.now()
+            mail.save()
+            return redirect('inbox')
+    else:
+        form = MailForm()
+
+    return render(request, 'send_mail.html', {'form': form})
+
+def inbox(request):
+    user_mails = Mails.objects.filter(toId=request.user)
+    sent_mails = Mails.objects.filter(fromId=request.user)
+    return render(request, 'inbox.html', {'user_mails': user_mails, 'sent_mails': sent_mails})

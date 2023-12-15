@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from GradjaApp.models import Users
+from GradjaApp.models import Users, Mails
 
 
 # Forma do rejestracji
@@ -25,3 +25,8 @@ class addGradetypeForm(forms.Form):
 class editGradetypeForm(forms.Form):
     typeName = forms.CharField(max_length=100, label='Nazwa')
     weight = forms.DecimalField(label='Wartość')
+        
+class MailForm(forms.ModelForm):
+    class Meta:
+        model = Mails
+        fields = ('toId', 'topic', 'mailText')
