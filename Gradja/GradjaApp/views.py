@@ -35,7 +35,7 @@ def add_class(request):
         form = AddClassForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect('add_class')
     else:
         form = AddClassForm()
 
@@ -48,7 +48,7 @@ def assign_students(request):
         form = AssignStudentsForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect('assign_students')
     else:
         form = AssignStudentsForm()
 
