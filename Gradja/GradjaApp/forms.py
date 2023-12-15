@@ -1,11 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+# Forma do rejestracji
+from GradjaApp.models import SubjectTypes
 from .models import ClassStudents, Classes
 import random
 import time
 from GradjaApp.models import Users, Mails
 from django import forms
-
 
 
 class SignUpForm(UserCreationForm):
@@ -56,9 +57,13 @@ class addGradetypeForm(forms.Form):
 class editGradetypeForm(forms.Form):
     typeName = forms.CharField(max_length=100, label='Nazwa')
     weight = forms.DecimalField(label='Wartość')
-        
+
+class SubjectChoice(forms.Form):
+    subjects = SubjectTypes.objects.all()
+    subjects_choices = [(subject.id, subject.nazwa) for subject in subjects]
+    choosen_subject = forms.ChoiceField(choices=subjects_choices)
+
 class MailForm(forms.ModelForm):
     class Meta:
         model = Mails
         fields = ('toId', 'topic', 'mailText')
-
