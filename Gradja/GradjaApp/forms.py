@@ -1,9 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from GradjaApp.models import Users
 from .models import ClassStudents, Classes
 import random
 import time
+from GradjaApp.models import Users, Mails
+from django import forms
+
+
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30)
@@ -12,9 +15,6 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = Users
         fields = ('username', 'first_name', 'last_name', 'password1', 'password2', )
-
-from django import forms
-from .models import Classes
 
 class AddClassForm(forms.ModelForm):
     activeFrom = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
@@ -45,3 +45,20 @@ class AssignStudentsForm(forms.ModelForm):
     class Meta:
         model = ClassStudents
         fields = ['studentId', 'classId', 'activeFrom', 'activeTo']
+
+class delGradetypeForm(forms.Form):
+    gradetypeId = forms.IntegerField(widget=forms.HiddenInput())
+
+class addGradetypeForm(forms.Form):
+    typeName = forms.CharField(max_length=100, label='Nazwa')
+    weight = forms.DecimalField(label='Wartość')
+
+class editGradetypeForm(forms.Form):
+    typeName = forms.CharField(max_length=100, label='Nazwa')
+    weight = forms.DecimalField(label='Wartość')
+        
+class MailForm(forms.ModelForm):
+    class Meta:
+        model = Mails
+        fields = ('toId', 'topic', 'mailText')
+

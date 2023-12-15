@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %} Edytuj rodzaj oceny {% endblock %}
+
+{% block content %}
+    <h2>Edytuj rodzaj oceny</h2>
+
+    <form method="post" action="{% url 'edit_gradetype' gradetype.typeId %}" class="gradetype-form">
+        {% csrf_token %}
+        <div class="form-field">
+            {{ form.typeName.label_tag }}
+            {{ form.typeName }}
+        </div>
+        <div class="form-field">
+            {{ form.weight.label_tag }}
+            {{ form.weight }}
+        </div>
+        <button type="submit">Zapisz zmiany</button>
+    </form>
+{% endblock %}
