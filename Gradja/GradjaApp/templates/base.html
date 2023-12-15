@@ -12,6 +12,7 @@
         <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     </head>
     <body>
         <div class="d-flex" id="wrapper">
@@ -26,6 +27,9 @@
                         {% endif %}
                         {% if request.user|has_group:"teacher" %} 
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_grades">Dodaj oceny</a>
+                        {% endif %}
+                        {% if request.user|has_group:"admin" %}
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_gradetype">Dodaj typ oceny</a>
                         {% endif %}
                     {% endif %}
                 </div>
