@@ -4,7 +4,7 @@ from GradjaApp.models import Users
 
 
 # Forma do rejestracji
-
+from GradjaApp.models import SubjectTypes
 
 
 class SignUpForm(UserCreationForm):
@@ -25,3 +25,8 @@ class addGradetypeForm(forms.Form):
 class editGradetypeForm(forms.Form):
     typeName = forms.CharField(max_length=100, label='Nazwa')
     weight = forms.DecimalField(label='Wartość')
+
+class SubjectChoice(forms.Form):
+    subjects = SubjectTypes.objects.all()
+    subjects_choices = [(subject.id, subject.nazwa) for subject in subjects]
+    choosen_subject = forms.ChoiceField(choices=subjects_choices)

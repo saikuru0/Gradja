@@ -8,7 +8,7 @@ from .decorators import not_logged_in_required, user_with_required_group
 
 # Create your views here.
 from .models import GradeType
-from .forms import delGradetypeForm, editGradetypeForm
+from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice
 from .forms import addGradetypeForm
 
 
@@ -87,3 +87,18 @@ def edit_gradetype(request, gradetype_id):
 
     context = {'form': form, 'gradetype': gradetype}
     return render(request, "edit_gradetype.html", context)
+
+
+def grade_view(request):
+    return render(request, 'grades.html', {})
+
+def add_grade_subject_choice(request):
+    if request.method == 'POST':
+        form = SubjectChoice(request.POST)
+        if form.is_valid():
+            # Tutaj możesz dodać obsługę wybranego przedmiotu, jeśli to konieczne
+            pass
+    else:
+        form = SubjectChoice()
+
+    return render(request, 'grades_choice.html', {'form': form})
