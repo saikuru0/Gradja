@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %} Assign a student to a class {% endblock %}
+
+{% block content %}
+<h2>Assign a student</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Assign</button>
+</form>
+{% endblock %}

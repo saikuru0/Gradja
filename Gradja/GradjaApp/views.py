@@ -1,13 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
-
-
-
-from GradjaApp.forms import SignUpForm
 from .decorators import not_logged_in_required, user_with_required_group
-
-# Create your views here.
+from GradjaApp.forms import SignUpForm
+from .forms import AddClassForm, AssignStudentsForm
 
 def home(request):
     return render(request, "home.html", {})
@@ -33,19 +29,27 @@ def signup(request):
 def set_grades(request):
     return render(request, 'set_grades.html', {})
 
-# views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import user_passes_test
-from .forms import AddClassForm
-
 @user_with_required_group('admin')
 def add_class(request):
     if request.method == 'POST':
         form = AddClassForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')  # You can redirect to any page you prefer
+            return redirect('home')
     else:
         form = AddClassForm()
 
     return render(request, 'add_class.html', {'form': form})
+
+
+@user_with_required_group('admin')
+def assign_students(request):
+    if request.method == 'POST':
+        form = AssignStudentsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = AssignStudentsForm()
+
+    return render(request, 'assign_students.html', {'form': form})
