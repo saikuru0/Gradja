@@ -41,7 +41,35 @@ Jeżeli nasz projekt jest gotów to można do mnie napisać, żeby zrobić merga
 
 ### Django:
 
-*W kwestii dockeryzacji jest prośba aby Igor opisał to w tym albo przed tym paragrafem (względnie coś zmienił)*
+Są dwa sposoby, Docker i lokalnie
+
+#### Docker
+
+Załączony `Makefile` pozwala na zarządzanie obrazem i kontenerem Docker, po odpaleniu `make` bez żadego taska wyświetli się pomoc
+
+```
+Usage:
+    make build - builds the Docker image
+    make create - creates and runs the Docker container
+    make remove - removes the running Docker container
+    make restart - restarts the running Docker container
+```
+
+Żeby zacząć pracę trzeba stworzyć obraz Docker i kontener z obrazu, po czym wystarczy zmieniać sam kod w folderze Gradja i restartować kontener jeśli zmiany nie będą automatycznie odzwierciedlone na `localhost:8000`. Można to zrobić korzystając z makefile lub manualnie
+
+```bash
+# with make
+make build
+make create
+make restart # to manually apply code changes
+
+# without make
+docker build -t gradja-img .
+docker run --name=gradja =p 8000:8000 -v ./Gradja:/usr/src/app -d gradja-img
+docker stop gradja; docker start gradja # to manually apply code changes
+```
+
+#### Lokalnie
 
 Na start należy pobrać Django (polecam do tego stworzyć przedtem venv i tam pracować, ja mam w tym samym katalogu co .git):
 ```
