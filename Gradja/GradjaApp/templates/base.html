@@ -37,7 +37,6 @@
                         {% if request.user|has_group:"teacher" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_grades">Dodaj oceny</a>
                         {% endif %}
-                        <!-- zakładam, że każdy może maile pisać -->
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/inbox">Mail</a>
 
                     {% endif %}
