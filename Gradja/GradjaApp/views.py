@@ -6,13 +6,14 @@ from django.utils import timezone
 from .models import Mails
 
 from GradjaApp.forms import SignUpForm, MailForm
-from .decorators import not_logged_in_required, user_with_required_group
-
-# Create your views here.
+from .forms import AddClassForm, AssignStudentsForm
 from .models import GradeType
 from .forms import delGradetypeForm, editGradetypeForm
 from .forms import addGradetypeForm
 
+from .decorators import not_logged_in_required, user_with_required_group
+
+# Create your views here.
 
 def home(request):
     return render(request, "home.html", {})
@@ -37,6 +38,7 @@ def signup(request):
 @user_with_required_group('teacher')
 def set_grades(request):
     return render(request, 'set_grades.html', {})
+
 
 @user_with_required_group('admin')
 def set_gradetype(request):
@@ -107,3 +109,30 @@ def inbox(request):
     user_mails = Mails.objects.filter(toId=request.user)
     sent_mails = Mails.objects.filter(fromId=request.user)
     return render(request, 'inbox.html', {'user_mails': user_mails, 'sent_mails': sent_mails})
+
+
+
+@user_with_required_group('admin')
+def add_class(request):
+    if request.method == 'POST':
+        form = AddClassForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('add_class')
+    else:
+        form = AddClassForm()
+
+    return render(request, 'add_class.html', {'form': form})
+
+
+@user_with_required_group('admin')
+def assign_students(request):
+    if request.method == 'POST':
+        form = AssignStudentsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('assign_students')
+    else:
+        form = AssignStudentsForm()
+
+    return render(request, 'assign_students.html', {'form': form})
