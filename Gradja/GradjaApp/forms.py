@@ -1,13 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-
 from django.forms import ModelForm
-from .models import SubjectTypes
+from .models import StudentParent, SubjectTypes
 from .models import Subjects
-
-
 from .models import ClassStudents, Classes, Users, Mails
 import random, time
+from django.core.exceptions import ValidationError
+
 
 
 class SignUpForm(UserCreationForm):
@@ -19,15 +18,18 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name', 'password1', 'password2', )
 
 
-# Forma do usuwania typu przedmiotu
+
 class DelSubjectTypeForm(forms.Form):
     typeId = forms.IntegerField(help_text="Enter the ID of the subject type to delete")
     
-# Form do dodawania
+
+
 class SubjectTypeForm(ModelForm):
     class Meta:
         model = SubjectTypes
         fields = ['typeId', 'typeName', 'description']
+
+
         
 class SubjectForm(ModelForm):
     class Meta:
@@ -55,7 +57,7 @@ class editGradetypeForm(forms.Form):
 
 class SubjectChoice(forms.Form):
     subjects = SubjectTypes.objects.all()
-    subjects_choices = [(subject.id, subject.nazwa) for subject in subjects]
+    subjects_choices = [(subject.typeId, subject.typeName) for subject in subjects]
     choosen_subject = forms.ChoiceField(choices=subjects_choices)
 
 
@@ -81,7 +83,7 @@ class AddClassForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-    
+
 
 
 def generate_unique_integer_id():
@@ -105,7 +107,7 @@ class editClassForm(forms.ModelForm):
 class delClassForm(forms.Form):
     classId = forms.IntegerField(widget=forms.HiddenInput())
 
-    
+
 
 class AssignStudentsForm(forms.ModelForm):
     activeFrom = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
@@ -114,3 +116,37 @@ class AssignStudentsForm(forms.ModelForm):
     class Meta:
         model = ClassStudents
         fields = ['studentId', 'classId', 'activeFrom', 'activeTo']
+
+
+
+class AddStudentParentForm(forms.ModelForm):
+    class Meta:
+        model = StudentParent
+        fields = ['studentId', 'parentId']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        student_id = cleaned_data.get('studentId')
+        parent_id = cleaned_data.get('parentId')
+
+        if student_id and parent_id and student_id == parent_id:
+            raise ValidationError("Student ID and Parent ID cannot be the same.")
+
+        existing_record = StudentParent.objects.filter(studentId=student_id, parentId=parent_id).exists()
+        if existing_record:
+            raise ValidationError("This combination of Student ID and Parent ID already exists.")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+        return instance
+
+
+
+
+class delStudentParentForm(forms.Form):
+    studentId = forms.CharField(widget=forms.HiddenInput())
+    parentId = forms.CharField(widget=forms.HiddenInput())

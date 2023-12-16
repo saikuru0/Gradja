@@ -1,21 +1,17 @@
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+# from django.contrib import messages
+# from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Mails,GradeType, Classes
+from .models import Mails,GradeType, Classes, StudentParent
 from GradjaApp.forms import SignUpForm, MailForm
-from .forms import AddClassForm, AssignStudentsForm, delClassForm, editClassForm
+from .forms import AddClassForm, AddStudentParentForm, AssignStudentsForm, delClassForm, delStudentParentForm, editClassForm
 from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm
 from .decorators import not_logged_in_required, user_with_required_group
 from .models import SubjectTypes
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
-from .forms import SubjectTypeForm
-
 from .models import SubjectTypes
-from django.shortcuts import get_object_or_404
-
 from .models import Subjects
 from .forms import SubjectForm
 
@@ -41,12 +37,13 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 
-# Przyklad uzycia dekoratora -> do zmiany lub calkowitego usuniecia.
+
 @user_with_required_group('teacher')
 def set_grades(request):
     return render(request, 'set_grades.html', {})
 
-#Start: Subject types:
+
+
 @user_with_required_group('admin')
 def set_type_subject(request):
     if request.method == 'POST':
@@ -60,6 +57,8 @@ def set_type_subject(request):
     form = DelSubjectTypeForm()
     return render(request, "set_type_subject.html", {'subject_types': subject_types, 'form': form})
 
+
+
 @user_with_required_group('admin')
 def add_subjecttype(request):
     if request.method == 'POST':
@@ -71,6 +70,8 @@ def add_subjecttype(request):
         form = SubjectTypeForm()
 
     return render(request, 'add_subjecttype.html', {'form': form})
+
+
 
 @user_with_required_group('admin')
 def edit_subject_type(request, typeId):
@@ -84,13 +85,15 @@ def edit_subject_type(request, typeId):
         form = SubjectTypeForm(instance=subject_type)
 
     return render(request, 'edit_subject_type.html', {'form': form})
-#End: Subject types
 
-#Start: Subjects
+
+
 @user_with_required_group('admin')
 def view_subjects(request):
     subjects = Subjects.objects.all()
     return render(request, "view_subjects.html", {'subjects': subjects})
+
+
 
 @user_with_required_group('admin')
 def add_subject(request):
@@ -103,6 +106,8 @@ def add_subject(request):
         form = SubjectForm()
     return render(request, 'add_subject.html', {'form': form})
 
+
+
 @user_with_required_group('admin')
 def edit_subject(request, subjectId):
     subject = get_object_or_404(Subjects, subjectId=subjectId)
@@ -114,7 +119,6 @@ def edit_subject(request, subjectId):
     else:
         form = SubjectForm(instance=subject)
     return render(request, 'edit_subject.html', {'form': form})
-#End: Subjects
 
 
 
@@ -136,11 +140,9 @@ def add_gradetype(request):
     if request.method == 'POST':
         form = addGradetypeForm(request.POST)
         if form.is_valid():
-            # Jeśli formularz jest poprawny, pobierz dane z formularza
             type_name = form.cleaned_data['typeName']
             weight = form.cleaned_data['weight']
 
-            # Stwórz nowy obiekt modelu GradeType i zapisz go w bazie danych
             new_grade_type = GradeType(typeName=type_name, weight=weight)
             new_grade_type.save()
 
@@ -164,7 +166,6 @@ def edit_gradetype(request, gradetype_id):
             gradetype.weight = form.cleaned_data['weight']
             gradetype.save()
 
-            # Przekieruj gdzieś po zakończeniu edycji
             return redirect('set_gradetype')
 
     else:
@@ -190,7 +191,6 @@ def add_grade_subject_choice(request):
     if request.method == 'POST':
         form = SubjectChoice(request.POST)
         if form.is_valid():
-            # Tutaj możesz dodać obsługę wybranego przedmiotu, jeśli to konieczne
             pass
     else:
         form = SubjectChoice()
@@ -278,3 +278,34 @@ def assign_students(request):
         form = AssignStudentsForm()
 
     return render(request, 'assign_students.html', {'form': form})
+
+
+@user_with_required_group('admin')
+def set_student_parent(request):
+    if request.method == 'POST':
+        postForm = delStudentParentForm(request.POST)
+        print("blablabla")
+        if postForm.is_valid():
+            student_id = postForm.cleaned_data['studentId']
+            parent_id = postForm.cleaned_data['parentId']
+            print('bla', student_id, parent_id)
+            student_parent = get_object_or_404(StudentParent, studentId=student_id, parentId=parent_id)
+            student_parent.delete()
+
+    student_parent = StudentParent.objects.all()
+    form = delStudentParentForm()
+    return render(request, 'set_student_parent.html', {'student_parent': student_parent, 'form': form})
+
+
+
+@user_with_required_group('admin')
+def add_student_parent(request):
+    if request.method == 'POST':
+        form = AddStudentParentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('set_student_parent')
+    else:
+        form = AddStudentParentForm()
+
+    return render(request, 'add_student_parent.html', {'form': form})

@@ -6,7 +6,6 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('accounts/signup/', views.signup, name='signup'),
     path('set_grades/', views.set_grades, name='set_grades'),
-    path('add_class/', views.add_class, name='add_class'),
     path('assign_students/', views.assign_students, name='assign_students'),
     path('set_grades', views.set_grades, name='set_grades'),
     path('set_type_subject/', views.set_type_subject, name='set_type_subject'),
@@ -26,4 +25,7 @@ urlpatterns = [
     path('set_class/', views.set_class, name='set_class'),
     path('add_class/', views.add_class, name='add_class'),
     path('edit_class/<int:class_id>/', views.edit_class, name='edit_class'),
+    path('set_student_parent/', views.set_student_parent, name='set_student_parent'),
+    path('add_student_parent/', views.add_student_parent, name='add_student_parent'),
 ]
+
