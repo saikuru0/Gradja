@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %} Oceny {% endblock %}
+
+{% block content %}
+    <h2>Oceny</h2>
+
+    <button type="submit" class="btn btn-primary delete-btn" style="background-color: blue">Zobacz</button>
+    <a href="{% url 'grades_choice' %}" class="btn btn-primary btn-success">Dodaj</a>
+{% endblock %}

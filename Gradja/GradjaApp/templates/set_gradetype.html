@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %} Set GradeType {% endblock %}
+
+{% block content %}
+
+    <h2>Grades Table</h2>
+
+    <a href="{% url 'add_gradetype' %}" class="btn btn-success">Dodaj</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in gradetypes %}
+                <tr>
+                    <td>{{ grade.typeName }}</td>
+                    <td>{{ grade.weight }}</td>
+                    <td><a href="{% url 'edit_gradetype' gradetype_id=grade.typeId %}" class="btn btn-primary">Zmień</a></td>
+                    <td>
+                        <form method="post" action="{% url 'set_gradetype' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="gradetypeId" value="{{ grade.typeId }}">
+                            <button type="submit" class="btn btn-primary delete-btn" style="background-color: red">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
