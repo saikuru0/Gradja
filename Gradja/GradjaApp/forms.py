@@ -28,6 +28,11 @@ class SubjectTypeForm(ModelForm):
     class Meta:
         model = SubjectTypes
         fields = ['typeId', 'typeName', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super(SubjectTypeForm, self).__init__(*args, **kwargs)
+        self.fields['typeId'].widget = forms.HiddenInput()
+    
         
 class SubjectForm(ModelForm):
     class Meta:
@@ -55,7 +60,7 @@ class editGradetypeForm(forms.Form):
 
 class SubjectChoice(forms.Form):
     subjects = SubjectTypes.objects.all()
-    subjects_choices = [(subject.id, subject.nazwa) for subject in subjects]
+    subjects_choices = [(subject.typeId, subject.typeName) for subject in subjects]
     choosen_subject = forms.ChoiceField(choices=subjects_choices)
 
 
