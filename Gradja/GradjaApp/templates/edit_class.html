@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %} Edytuj klasę {% endblock %}
+
+{% block content %}
+    <h2>Edytuj klasę</h2>
+
+    <form method="post" action="{% url 'edit_class' class.classId %}" class="gradetype-form">
+        {% csrf_token %}
+        <div class="form-field">
+            {{ form.className.label_tag }}
+            {{ form.className }}
+        </div>
+        <div class="form-field">
+            {{ form.homeroomTeacher.label_tag }}
+            {{ form.homeroomTeacher }}
+        </div>
+        <div class="form-field">
+            {{ form.activeFrom.label_tag }}
+            {{ form.activeFrom }}
+        </div>
+        <div class="form-field">
+            {{ form.activeTo.label_tag }}
+            {{ form.activeTo }}
+        </div>
+        <button type="submit">Zapisz zmiany</button>
+    </form>
+{% endblock %}
