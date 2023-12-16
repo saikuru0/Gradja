@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %} Klasy {% endblock %}
+
+{% block content %}
+
+    <h2>Klasy</h2>
+
+    <a href="{% url 'add_class' %}" class="btn btn-success">Dodaj</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nazwa</th>
+                <th>Wychowawca</th>
+                <th>Aktywna od</th>
+                <th>Aktywna do</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for class in classes %}
+                <tr>
+                    <td>{{ class.classId }}</td>
+                    <td>{{ class.className }}</td>
+                    <td>{{ class.homeroomTeacher }}</td>
+                    <td>{{ class.activeFrom }}</td>
+                    <td>{{ class.activeTo }}</td>
+                    <td><a href="{% url 'edit_class' class_id=class.classId %}" class="btn btn-primary">Zmień</a></td>
+                    <td>
+                        <form method="post" action="{% url 'set_class' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="classId" value="{{ class.classId }}">
+                            <button type="submit" class="btn btn-primary delete-btn" style="background-color: red">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

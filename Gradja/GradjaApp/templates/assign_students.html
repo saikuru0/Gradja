@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %} Assign a student to a class {% endblock %}
+{% block title %} Przypisz ucznia {% endblock %}
 
 {% block content %}
-<h2>Assign a student</h2>
+
+<h2>Przypisz ucznia do klasy</h2>
+
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Assign</button>
+  <button type="submit">Zapisz</button>
 </form>
+
 {% endblock %}

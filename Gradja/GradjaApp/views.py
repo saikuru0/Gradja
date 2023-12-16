@@ -3,20 +3,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Mails
-
+from .models import Mails,GradeType, Classes
 from GradjaApp.forms import SignUpForm, MailForm
-from .forms import AddClassForm, AssignStudentsForm
-from .models import GradeType
-from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice
-from .forms import addGradetypeForm
-
+from .forms import AddClassForm, AssignStudentsForm, delClassForm, editClassForm
+from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm
 from .decorators import not_logged_in_required, user_with_required_group
-
-# Create your views here.
 
 def home(request):
     return render(request, "home.html", {})
+
+
 
 @not_logged_in_required
 def signup(request):
@@ -40,6 +36,7 @@ def set_grades(request):
     return render(request, 'set_grades.html', {})
 
 
+
 @user_with_required_group('admin')
 def set_gradetype(request):
     if request.method == 'POST':
@@ -51,6 +48,8 @@ def set_gradetype(request):
     gradetypes = GradeType.objects.all()
     form = delGradetypeForm()
     return render(request, "set_gradetype.html", {'gradetypes' : gradetypes, 'form' : form})
+
+
 
 def add_gradetype(request):
     if request.method == 'POST':
@@ -72,6 +71,8 @@ def add_gradetype(request):
     context = {'form': form}
     return render(request, "add_gradetype.html", context)
 
+
+
 def edit_gradetype(request, gradetype_id):
     gradetype = get_object_or_404(GradeType, typeId=gradetype_id)
 
@@ -91,12 +92,18 @@ def edit_gradetype(request, gradetype_id):
     context = {'form': form, 'gradetype': gradetype}
     return render(request, "edit_gradetype.html", context)
 
+
+
 def view_mail(request, mail_id):
     mail = get_object_or_404(Mails, mailId=mail_id)
     return render(request, 'view_mail.html', {'mail': mail})
 
+
+
 def grade_view(request):
     return render(request, 'grades.html', {})
+
+
 
 def add_grade_subject_choice(request):
     if request.method == 'POST':
@@ -108,6 +115,8 @@ def add_grade_subject_choice(request):
         form = SubjectChoice()
 
     return render(request, 'grades_choice.html', {'form': form})
+
+
 
 def send_mail(request):
     if request.method == 'POST':
@@ -123,10 +132,26 @@ def send_mail(request):
 
     return render(request, 'send_mail.html', {'form': form})
 
+
+
 def inbox(request):
     user_mails = Mails.objects.filter(toId=request.user)
     sent_mails = Mails.objects.filter(fromId=request.user)
     return render(request, 'inbox.html', {'user_mails': user_mails, 'sent_mails': sent_mails})
+
+
+
+@user_with_required_group('admin')
+def set_class(request):
+    if request.method == 'POST':
+        postForm = delClassForm(request.POST)
+        if postForm.is_valid():
+            class_id = postForm.cleaned_data['classId']
+            classes = Classes.objects.get(classId=class_id)
+            classes.delete()
+    classes = Classes.objects.all()
+    form = delClassForm()
+    return render(request, 'set_class.html', {'classes': classes, 'form' : form})
 
 
 
@@ -141,6 +166,24 @@ def add_class(request):
         form = AddClassForm()
 
     return render(request, 'add_class.html', {'form': form})
+
+
+
+def edit_class(request, class_id):
+    instance = get_object_or_404(Classes, classId=class_id)
+
+    if request.method == 'POST':
+        form = editClassForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('set_class')
+
+    else:
+        form = editClassForm(instance=instance)
+
+    context = {'form': form, 'class': instance}
+    return render(request, "edit_class.html", context)
+
 
 
 @user_with_required_group('admin')

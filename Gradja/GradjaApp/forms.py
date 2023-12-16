@@ -1,13 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-# Forma do rejestracji
 from GradjaApp.models import SubjectTypes
-from .models import ClassStudents, Classes
-import random
-import time
-from GradjaApp.models import Users, Mails
-from django import forms
-
+from .models import ClassStudents, Classes, Users, Mails
+import random, time
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30)
@@ -17,9 +12,42 @@ class SignUpForm(UserCreationForm):
         model = Users
         fields = ('username', 'first_name', 'last_name', 'password1', 'password2', )
 
+
+
+class delGradetypeForm(forms.Form):
+    gradetypeId = forms.IntegerField(widget=forms.HiddenInput())
+
+
+
+class addGradetypeForm(forms.Form):
+    typeName = forms.CharField(max_length=100, label='Nazwa')
+    weight = forms.DecimalField(label='Wartość')
+
+
+
+class editGradetypeForm(forms.Form):
+    typeName = forms.CharField(max_length=100, label='Nazwa')
+    weight = forms.DecimalField(label='Wartość')
+
+
+
+class SubjectChoice(forms.Form):
+    subjects = SubjectTypes.objects.all()
+    subjects_choices = [(subject.id, subject.nazwa) for subject in subjects]
+    choosen_subject = forms.ChoiceField(choices=subjects_choices)
+
+
+
+class MailForm(forms.ModelForm):
+    class Meta:
+        model = Mails
+        fields = ('toId', 'topic', 'mailText')
+
+
+
 class AddClassForm(forms.ModelForm):
-    activeFrom = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    activeTo = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    activeFrom = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label = 'Aktywna od')
+    activeTo = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label = 'Aktywna do')
 
     class Meta:
         model = Classes
@@ -31,6 +59,8 @@ class AddClassForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+    
+
 
 def generate_unique_integer_id():
     timestamp = int(time.time())
@@ -39,6 +69,22 @@ def generate_unique_integer_id():
     return unique_id
 
 
+
+class editClassForm(forms.ModelForm):
+    activeFrom = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label = 'Aktywna od')
+    activeTo = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label = 'Aktywna do')
+
+    class Meta:
+        model = Classes
+        fields = ['className', 'homeroomTeacher', 'activeFrom', 'activeTo']
+
+
+
+class delClassForm(forms.Form):
+    classId = forms.IntegerField(widget=forms.HiddenInput())
+
+    
+
 class AssignStudentsForm(forms.ModelForm):
     activeFrom = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     activeTo = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
@@ -46,24 +92,3 @@ class AssignStudentsForm(forms.ModelForm):
     class Meta:
         model = ClassStudents
         fields = ['studentId', 'classId', 'activeFrom', 'activeTo']
-
-class delGradetypeForm(forms.Form):
-    gradetypeId = forms.IntegerField(widget=forms.HiddenInput())
-
-class addGradetypeForm(forms.Form):
-    typeName = forms.CharField(max_length=100, label='Nazwa')
-    weight = forms.DecimalField(label='Wartość')
-
-class editGradetypeForm(forms.Form):
-    typeName = forms.CharField(max_length=100, label='Nazwa')
-    weight = forms.DecimalField(label='Wartość')
-
-class SubjectChoice(forms.Form):
-    subjects = SubjectTypes.objects.all()
-    subjects_choices = [(subject.id, subject.nazwa) for subject in subjects]
-    choosen_subject = forms.ChoiceField(choices=subjects_choices)
-
-class MailForm(forms.ModelForm):
-    class Meta:
-        model = Mails
-        fields = ('toId', 'topic', 'mailText')
