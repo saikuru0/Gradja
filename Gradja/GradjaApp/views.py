@@ -91,6 +91,10 @@ def edit_gradetype(request, gradetype_id):
     context = {'form': form, 'gradetype': gradetype}
     return render(request, "edit_gradetype.html", context)
 
+def view_mail(request, mail_id):
+    mail = get_object_or_404(Mails, mailId=mail_id)
+    return render(request, 'view_mail.html', {'mail': mail})
+
 def grade_view(request):
     return render(request, 'grades.html', {})
 

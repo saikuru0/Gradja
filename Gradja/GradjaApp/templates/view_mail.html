@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %} Wiadomość {% endblock %}
+
+{% block content %}
+  <p>{{ mail.fromId }} ({{ mail.sendDate }})</p>
+  <h4 class="display-4">{{ mail.topic }}</h4>
+  <p>
+    {{ mail.mailText }}
+  </p>
+{% endblock %}

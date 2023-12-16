@@ -15,4 +15,5 @@ urlpatterns = [
     path("grades_choice", views.add_grade_subject_choice, name='grades_choice'),
     path('send_mail', views.send_mail, name='send_mail'),
     path('inbox', views.inbox, name='inbox'),
+    path('view_mail/<int:mail_id>/', views.view_mail, name='view_mail'),
 ]
