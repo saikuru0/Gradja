@@ -6,7 +6,7 @@
         <h5>Odebrane</h5>
         <ul>
             {% for mail in user_mails %}
-                <li>{{ mail.topic }} - {{ mail.fromId }} ({{ mail.sendDate }})</li>
+                <li><a href="/view_mail/{{ mail.mailId }}">{{ mail.topic }}</a> - {{ mail.fromId }} ({{ mail.sendDate }})</span></li>
             {% endfor %}
         </ul>
     {% else %}
@@ -16,11 +16,12 @@
         <h5>Wysłane</h5>
         <ul>
             {% for mail in sent_mails %}
-                <li>{{ mail.topic }} - {{ mail.fromId }} ({{ mail.sendDate }})</li>
+                <li><a href="/view_mail/{{ mail.mailId }}">{{ mail.topic }}</a> - {{ mail.fromId }} ({{ mail.sendDate }})</span></li>
             {% endfor %}
         </ul>
     {% else %}
         <p>Jescze nikt nie otrzymał twoich wiadomości :3</p>
     {% endif %}
+    <a href="/send_mail">Wyślij wiadomość</a>
 {% endblock %}
 
