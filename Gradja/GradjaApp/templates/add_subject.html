@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Subject{% endblock %}
+
+{% block content %}
+<h2>Add New Subject</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Add Subject</button>
+</form>
+<a href="{% url 'view_subjects' %}" class="btn btn-secondary">Back to Subjects</a>
+{% endblock %}

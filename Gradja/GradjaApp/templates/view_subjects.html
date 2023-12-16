@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Subjects{% endblock %}
+
+{% block content %}
+    <h2>Subjects</h2>
+    <a href="{% url 'add_subject' %}" class="btn btn-success">Add new Subject</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Class</th>
+                <th>Subject Type</th>
+                <th>Teacher</th>
+                <th>Active From</th>
+                <th>Active To</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in subjects %}
+            <tr>
+                <td>{{ subject.subjectId }}</td>
+                <td>{{ subject.classId }}</td>
+                <td>{{ subject.subjectType }}</td>
+                <td>{{ subject.teacherId }}</td>
+                <td>{{ subject.activeFrom }}</td>
+                <td>{{ subject.activeTo }}</td>
+                <td>
+                    <a href="{% url 'edit_subject' subject.subjectId %}" class="btn btn-primary">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
