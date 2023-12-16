@@ -32,17 +32,20 @@
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/assign_students">Przypisz ucznia do klasy</a>
                         {% endif %}
-                        {% if request.user|has_group:"admin" %} 
-                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_type_subject">Subject Types</a>
-                         {% endif %}
-                        {% if request.user|has_group:"admin" %} 
-                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/subjects">Subjects</a>
-                         {% endif %}
+                        {% if request.user|has_group:"admin" %}
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_type_subject">Typy przedmiotów</a>
+                        {% endif %}
+                        {% if request.user|has_group:"admin" %}
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/subjects">Przedmioty</a>
+                        {% endif %}
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_gradetype">Dodaj typ oceny</a>
                         {% endif %}
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/grades">Oceny</a>
+                        {% endif %}
+                        {% if request.user|has_group:"admin" %}
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_student_parent">Przypisywanie rodziców do uczniów</a>
                         {% endif %}
                         {% if request.user|has_group:"teacher" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_grades">Dodaj oceny</a>
@@ -59,11 +62,11 @@
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
                                 {% if user.is_authenticated %}
-                               <li class="nav-item active"><a class="nav-link" href="/accounts/logout">Logout</a></li>
+                            <li class="nav-item active"><a class="nav-link" href="/accounts/logout">Logout</a></li>
                                 {% else %}
                                 <li class="nav-item active"><a class="nav-link" href="/accounts/login">Login</a></li>
                                 <li class="nav-item active"><a class="nav-link" href="/accounts/signup">Sign up</a></li>
-                               {% endif %}
+                            {% endif %}
                             </ul>
                         </div>
                     </div>
