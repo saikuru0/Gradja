@@ -12,6 +12,7 @@ from .models import SubjectTypes
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
 from .forms import SubjectTypeForm
+from .forms import generate_unique_integer_id
 
 from .models import SubjectTypes
 from django.shortcuts import get_object_or_404
@@ -69,6 +70,7 @@ def add_subjecttype(request):
             return redirect('set_type_subject')
     else:
         form = SubjectTypeForm()
+        form.initial['typeId'] = generate_unique_integer_id()
 
     return render(request, 'add_subjecttype.html', {'form': form})
 
