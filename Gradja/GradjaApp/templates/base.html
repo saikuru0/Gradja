@@ -26,7 +26,7 @@
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/admin">Panel admina</a>
                         {% endif %}
                         {% if request.user|has_group:"admin" %}
-                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/add_class">Dodaj klasę</a>
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_class">Klasy</a>
                         {% endif %}
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/assign_students">Przypisz ucznia do klasy</a>
