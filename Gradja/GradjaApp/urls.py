@@ -27,5 +27,6 @@ urlpatterns = [
     path('edit_class/<int:class_id>/', views.edit_class, name='edit_class'),
     path('set_student_parent/', views.set_student_parent, name='set_student_parent'),
     path('add_student_parent/', views.add_student_parent, name='add_student_parent'),
+    path('add_one_grade',  views.add_one_grade, name='add_one_grade' ),
 ]
 
