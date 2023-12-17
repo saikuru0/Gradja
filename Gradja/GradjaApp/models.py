@@ -26,6 +26,11 @@ class Users(AbstractUser):
         db_table = "Users"
         verbose_name_plural = "Users"
 
+    def __str__(self):
+        return self.first_name + " " + self.last_name
+
+
+
 
 class StudentParent(models.Model):
     studentId = models.ForeignKey(Users, on_delete = models.CASCADE)
@@ -62,6 +67,9 @@ class Classes(models.Model):
         db_table = "Classes"
         verbose_name_plural = "Classes"
 
+    def __str__(self):
+        return self.className
+
 
 class ClassStudents(models.Model):
     classId = models.ForeignKey(Classes, on_delete = models.CASCADE)
@@ -83,6 +91,9 @@ class SubjectTypes(models.Model):
         db_table = "Subject types"
         verbose_name_plural = "Subject types"
 
+    def __str__(self):
+        return self.typeName
+
 
 class Subjects(models.Model):
     subjectId = models.IntegerField(primary_key = True)
@@ -96,6 +107,9 @@ class Subjects(models.Model):
         db_table = "Subjects"
         verbose_name_plural = "Subjects"
 
+    def __str__(self):
+        return self.subjectType.__str__() + " " + self.classId.__str__()
+
 
 class GradeType(models.Model):
     typeId = models.IntegerField(primary_key = True)
@@ -106,6 +120,9 @@ class GradeType(models.Model):
         db_table = "Grade Types"
         verbose_name_plural = "Grade Types"
 
+    def __str__(self):
+        return self.typeName
+
 
 class GradeValue(models.Model):
     gradeId = models.FloatField(primary_key = True)
@@ -115,12 +132,15 @@ class GradeValue(models.Model):
         db_table = "Grade Values"
         verbose_name_plural = "Grade Values"
 
+    def __str__(self):
+        return self.typeName
+
 
 class Grades(models.Model):
-    gradeId = models.FloatField(primary_key = True)
+    gradeId = models.IntegerField(primary_key = True)
     classId = models.ForeignKey(Subjects, on_delete = models.CASCADE)
     studentId = models.ForeignKey(Users, on_delete = models.CASCADE)
-    gradeId = models.ForeignKey(GradeValue, on_delete = models.CASCADE)
+    gradeValueId = models.ForeignKey(GradeValue, null=True, blank=True, on_delete = models.CASCADE)
     typeId = models.ForeignKey(GradeType, on_delete = models.CASCADE)
     description = models.TextField()
 
