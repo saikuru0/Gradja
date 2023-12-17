@@ -9,6 +9,9 @@ from .decorators import not_logged_in_required, user_with_required_group
 from .models import SubjectTypes
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
+from .forms import SubjectTypeForm
+from .forms import generate_unique_integer_id
+
 from .models import SubjectTypes
 from .models import Subjects
 from .forms import SubjectForm
@@ -67,6 +70,7 @@ def add_subjecttype(request):
             return redirect('set_type_subject')
     else:
         form = SubjectTypeForm()
+        form.initial['typeId'] = generate_unique_integer_id()
 
     return render(request, 'add_subjecttype.html', {'form': form})
 

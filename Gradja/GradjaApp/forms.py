@@ -29,7 +29,10 @@ class SubjectTypeForm(ModelForm):
         model = SubjectTypes
         fields = ['typeId', 'typeName', 'description']
 
-
+    def __init__(self, *args, **kwargs):
+        super(SubjectTypeForm, self).__init__(*args, **kwargs)
+        self.fields['typeId'].widget = forms.HiddenInput()
+    
         
 class SubjectForm(ModelForm):
     class Meta:
