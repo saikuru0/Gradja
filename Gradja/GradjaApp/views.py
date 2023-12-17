@@ -3,16 +3,15 @@
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Mails,GradeType, Classes, StudentParent
-from GradjaApp.forms import SignUpForm, MailForm
-from .forms import AddClassForm, AddStudentParentForm, AssignStudentsForm, delClassForm, delStudentParentForm, editClassForm
-from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm
+from .forms import AddClassForm, AddStudentParentForm, AssignStudentsForm, delClassForm, delStudentParentForm, editClassForm, SignUpForm, MailForm
+from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades
+from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm, AddOneGrade
 from .decorators import not_logged_in_required, user_with_required_group
 from .models import SubjectTypes
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
+from .forms import generate_unique_integer_id
 from .models import SubjectTypes
-from .models import Subjects
 from .forms import SubjectForm
 
 
@@ -68,6 +67,7 @@ def add_subjecttype(request):
             return redirect('set_type_subject')
     else:
         form = SubjectTypeForm()
+        form.initial['typeId'] = generate_unique_integer_id()
 
     return render(request, 'add_subjecttype.html', {'form': form})
 
@@ -135,7 +135,7 @@ def set_gradetype(request):
     return render(request, "set_gradetype.html", {'gradetypes' : gradetypes, 'form' : form})
 
 
-
+@user_with_required_group('admin')
 def add_gradetype(request):
     if request.method == 'POST':
         form = addGradetypeForm(request.POST)
@@ -155,7 +155,7 @@ def add_gradetype(request):
     return render(request, "add_gradetype.html", context)
 
 
-
+@user_with_required_group('admin')
 def edit_gradetype(request, gradetype_id):
     gradetype = get_object_or_404(GradeType, typeId=gradetype_id)
 
@@ -191,11 +191,32 @@ def add_grade_subject_choice(request):
     if request.method == 'POST':
         form = SubjectChoice(request.POST)
         if form.is_valid():
-            pass
+            chosen = form.cleaned_data['chosen_subject']
+            selected_subject = chosen.subjectId
+            request.session['chosen_subject'] = selected_subject
+            return redirect('add_one_grade')
     else:
         form = SubjectChoice()
 
     return render(request, 'grades_choice.html', {'form': form})
+
+
+def add_one_grade(request):
+    if request.method == 'POST':
+        form = AddOneGrade(request.POST)
+        if form.is_valid():
+            form.save()
+        else:
+            print(form.errors)
+        return redirect('grades_choice')
+
+    else:
+        selected_subject = request.session.get('chosen_subject', None)
+        subject = Subjects.objects.filter(subjectId=selected_subject).first()
+        form = AddOneGrade(initial={'classId': subject})
+
+    context = {'form': form, 'selected_subject': selected_subject, }
+    return render(request, "add_one_grade.html", context)
 
 
 

@@ -1,0 +1,15 @@
+<!-- add_one_grade.html -->
+{% extends 'base.html' %}
+
+{% block title %} Oceny {% endblock %}
+
+{% block content %}
+    <h2>{% if chosen_subject %}Wybrany przedmiot: {{ chosen_subject }}{% endif %}</h2>
+
+
+    <form method="post" action="{% url 'add_one_grade' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Dodaj ocenę</button>
+    </form>
+{% endblock %}
