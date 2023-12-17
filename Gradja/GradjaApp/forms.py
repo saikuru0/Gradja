@@ -174,6 +174,10 @@ class AssignStudentsForm(forms.ModelForm):
         model = ClassStudents
         fields = ['studentId', 'classId', 'activeFrom', 'activeTo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['studentId'].queryset = Users.objects.filter(groups__name='student')
+
 
 
 class AddStudentParentForm(forms.ModelForm):
