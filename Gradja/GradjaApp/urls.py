@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import edit_subject_type
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -8,6 +9,12 @@ urlpatterns = [
     path('add_class/', views.add_class, name='add_class'),
     path('assign_students/', views.assign_students, name='assign_students'),
     path('set_grades', views.set_grades, name='set_grades'),
+    path('set_type_subject/', views.set_type_subject, name='set_type_subject'),
+    path('add_subjecttype/', views.add_subjecttype, name='add_subjecttype'), 
+    path('edit_subject_type/<int:typeId>/', edit_subject_type, name='edit_subject_type'),
+    path('subjects/', views.view_subjects, name='view_subjects'),
+    path('subjects/add', views.add_subject, name='add_subject'),
+    path('subjects/edit/<int:subjectId>/', views.edit_subject, name='edit_subject'),
     path("set_gradetype", views.set_gradetype, name='set_gradetype'),
     path("add_gradetype", views.add_gradetype, name='add_gradetype'),
     path('edit_gradetype/<int:gradetype_id>/', views.edit_gradetype, name='edit_gradetype'),

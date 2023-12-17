@@ -22,6 +22,7 @@
                 <div class="list-group list-group-flush">
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/">Home</a>
                     {% if user.is_authenticated %}
+
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/admin">Panel admina</a>
                         {% endif %}
@@ -31,6 +32,12 @@
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/assign_students">Przypisz ucznia do klasy</a>
                         {% endif %}
+                        {% if request.user|has_group:"admin" %} 
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_type_subject">Subject Types</a>
+                         {% endif %}
+                        {% if request.user|has_group:"admin" %} 
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/subjects">Subjects</a>
+                         {% endif %}
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_gradetype">Dodaj typ oceny</a>
                         {% endif %}

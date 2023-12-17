@@ -1,7 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import ClassStudents, Classes, Users, Mails, GradeType, GradeValue, Grades, SubjectTypes, Subjects
+from django.forms import ModelForm
+
 import random, time
+
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30)
@@ -10,6 +13,27 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = Users
         fields = ('username', 'first_name', 'last_name', 'password1', 'password2', )
+
+
+# Forma do usuwania typu przedmiotu
+class DelSubjectTypeForm(forms.Form):
+    typeId = forms.IntegerField(help_text="Enter the ID of the subject type to delete")
+    
+# Form do dodawania
+class SubjectTypeForm(ModelForm):
+    class Meta:
+        model = SubjectTypes
+        fields = ['typeId', 'typeName', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super(SubjectTypeForm, self).__init__(*args, **kwargs)
+        self.fields['typeId'].widget = forms.HiddenInput()
+    
+        
+class SubjectForm(ModelForm):
+    class Meta:
+        model = Subjects
+        fields = '__all__'
 
 
 
@@ -80,7 +104,6 @@ class AddOneGrade(forms.ModelForm):
             self.fields['studentId'].queryset = Users.objects.filter(
                 id__in=ClassStudents.objects.filter(classId=class_id).values('studentId')
             )
-
 
 
 
