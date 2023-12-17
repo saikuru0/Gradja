@@ -1,5 +1,3 @@
-# from django.contrib import messages
-# from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -13,6 +11,7 @@ from .forms import SubjectTypeForm
 from .forms import generate_unique_integer_id
 from .models import SubjectTypes
 from .forms import SubjectForm
+
 
 
 def home(request):
@@ -270,7 +269,7 @@ def add_class(request):
     return render(request, 'add_class.html', {'form': form})
 
 
-
+@user_with_required_group('admin')
 def edit_class(request, class_id):
     instance = get_object_or_404(Classes, classId=class_id)
 

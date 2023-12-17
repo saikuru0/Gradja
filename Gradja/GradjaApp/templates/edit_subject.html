@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Subject{% endblock %}
+{% block title %}Edytuj przedmiot{% endblock %}
 
 {% block content %}
-<h2>Edit Subject</h2>
+<h2>Edytuj przedmiot</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Update Subject</button>
+    <button type="submit" class="btn btn-primary">Zaktualizuj</button>
 </form>
-<a href="{% url 'view_subjects' %}" class="btn btn-secondary">Back to Subjects</a>
+<a href="{% url 'view_subjects' %}" class="btn btn-secondary">Powrót</a>
 {% endblock %}

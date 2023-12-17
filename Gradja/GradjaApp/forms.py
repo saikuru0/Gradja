@@ -3,9 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
 from .models import StudentParent, SubjectTypes
 from .models import ClassStudents, Classes, Users, Mails, GradeType, GradeValue, Grades, SubjectTypes, Subjects
-
 import random, time
-from django.core.exceptions import ValidationError
 
 
 
@@ -20,8 +18,8 @@ class SignUpForm(UserCreationForm):
 
 
 class DelSubjectTypeForm(forms.Form):
-    typeId = forms.IntegerField(help_text="Enter the ID of the subject type to delete")
-    
+    typeId = forms.IntegerField(help_text="Wpisz ID przedmiotu do usunięcia.")
+
 
 
 class SubjectTypeForm(ModelForm):
@@ -32,8 +30,9 @@ class SubjectTypeForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SubjectTypeForm, self).__init__(*args, **kwargs)
         self.fields['typeId'].widget = forms.HiddenInput()
-    
-        
+
+
+
 class SubjectForm(ModelForm):
     class Meta:
         model = Subjects
@@ -56,11 +55,15 @@ class editGradetypeForm(forms.Form):
     typeName = forms.CharField(max_length=100, label='Nazwa')
     weight = forms.DecimalField(label='Wartość')
 
+
+
 class SubjectChoice(forms.Form):
     chosen_subject = forms.ModelChoiceField(
         queryset=Subjects.objects.all(),
         label='Przedmiot'
     )
+
+
 
 class AddOneGrade(forms.ModelForm):
     gradeId = forms.IntegerField(widget=forms.HiddenInput())
@@ -126,6 +129,10 @@ class AddClassForm(forms.ModelForm):
         model = Classes
         fields = ['className', 'homeroomTeacher', 'activeFrom', 'activeTo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['homeroomTeacher'].queryset = Users.objects.filter(groups__name='teacher')
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.classId = generate_unique_integer_id()
@@ -150,6 +157,10 @@ class editClassForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ['className', 'homeroomTeacher', 'activeFrom', 'activeTo']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['homeroomTeacher'].queryset = Users.objects.filter(groups__name='teacher')
 
 
 
@@ -166,6 +177,10 @@ class AssignStudentsForm(forms.ModelForm):
         model = ClassStudents
         fields = ['studentId', 'classId', 'activeFrom', 'activeTo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['studentId'].queryset = Users.objects.filter(groups__name='student')
+
 
 
 class AddStudentParentForm(forms.ModelForm):
@@ -173,17 +188,19 @@ class AddStudentParentForm(forms.ModelForm):
         model = StudentParent
         fields = ['studentId', 'parentId']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['studentId'].queryset = Users.objects.filter(groups__name='student')
+        self.fields['parentId'].queryset = Users.objects.filter(groups__name='parent')
+
     def clean(self):
         cleaned_data = super().clean()
         student_id = cleaned_data.get('studentId')
         parent_id = cleaned_data.get('parentId')
 
-        if student_id and parent_id and student_id == parent_id:
-            raise ValidationError("Student ID and Parent ID cannot be the same.")
-
         existing_record = StudentParent.objects.filter(studentId=student_id, parentId=parent_id).exists()
         if existing_record:
-            raise ValidationError("This combination of Student ID and Parent ID already exists.")
+            raise forms.ValidationError("Podane dane znajdują się już w bazie.")
 
         return cleaned_data
 
@@ -192,7 +209,6 @@ class AddStudentParentForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
 
 
 
