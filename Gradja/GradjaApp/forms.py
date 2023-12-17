@@ -3,9 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
 from .models import StudentParent, SubjectTypes
 from .models import ClassStudents, Classes, Users, Mails, GradeType, GradeValue, Grades, SubjectTypes, Subjects
-
 import random, time
-from django.core.exceptions import ValidationError
 
 
 
@@ -21,7 +19,7 @@ class SignUpForm(UserCreationForm):
 
 class DelSubjectTypeForm(forms.Form):
     typeId = forms.IntegerField(help_text="Wpisz ID przedmiotu do usunięcia.")
-    
+
 
 
 class SubjectTypeForm(ModelForm):
@@ -32,8 +30,9 @@ class SubjectTypeForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SubjectTypeForm, self).__init__(*args, **kwargs)
         self.fields['typeId'].widget = forms.HiddenInput()
-    
-        
+
+
+
 class SubjectForm(ModelForm):
     class Meta:
         model = Subjects
@@ -56,11 +55,15 @@ class editGradetypeForm(forms.Form):
     typeName = forms.CharField(max_length=100, label='Nazwa')
     weight = forms.DecimalField(label='Wartość')
 
+
+
 class SubjectChoice(forms.Form):
     chosen_subject = forms.ModelChoiceField(
         queryset=Subjects.objects.all(),
         label='Przedmiot'
     )
+
+
 
 class AddOneGrade(forms.ModelForm):
     gradeId = forms.IntegerField(widget=forms.HiddenInput())
