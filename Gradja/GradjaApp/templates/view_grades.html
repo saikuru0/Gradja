@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %} Oceny {% endblock %}
+
+{% block content %}
+  <h2 class="display-4">Przedmioty i ich oceny</h2>
+  {% if sg %}
+    <ul>
+    {% for el in sg %}
+      <li>
+        <h4>{{ el.0.subjectType }}</h4>
+        <ul>
+        {% for grade in el.1 %}
+          <li>
+            {{ grade.gradeValueId.gradeId }} ({{grade.typeId.typeName}}, mnożnik x{{ grade.typeId.weight }}), Opis: {{ grade.description }}
+          </li>
+        {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>no subjects ._O</p>
+  {% endif %}
+{% endblock %}
