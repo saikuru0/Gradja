@@ -20,7 +20,7 @@ class SignUpForm(UserCreationForm):
 
 
 class DelSubjectTypeForm(forms.Form):
-    typeId = forms.IntegerField(help_text="Enter the ID of the subject type to delete")
+    typeId = forms.IntegerField(help_text="Wpisz ID przedmiotu do usunięcia.")
     
 
 
@@ -130,11 +130,11 @@ class AddStudentParentForm(forms.ModelForm):
         parent_id = cleaned_data.get('parentId')
 
         if student_id and parent_id and student_id == parent_id:
-            raise ValidationError("Student ID and Parent ID cannot be the same.")
+            raise ValidationError("ID ucznia i rodzica nie mogą być takie same.")
 
         existing_record = StudentParent.objects.filter(studentId=student_id, parentId=parent_id).exists()
         if existing_record:
-            raise ValidationError("This combination of Student ID and Parent ID already exists.")
+            raise ValidationError("Podane dane znajdują się już w bazie.")
 
         return cleaned_data
 

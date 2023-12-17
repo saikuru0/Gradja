@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %} Set SubjectType {% endblock %}
+{% block title %} Typy przedmiotów {% endblock %}
 
 {% block content %}
 
-    <h2 style="margin-bottom: 30px;">Subject Types Table</h2>
+    <h2 style="margin-bottom: 30px;">Typy przedmiotów</h2>
 
-    <a style="margin-bottom: 30px;" href="{% url 'add_subjecttype' %}" class="btn btn-success">Add new</a>
+    <a style="margin-bottom: 30px;" href="{% url 'add_subjecttype' %}" class="btn btn-success">Dodaj</a>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Description</th>
+                <th>Nazwa</th>
+                <th>Opis</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +26,7 @@
                         <form method="post" action="{% url 'set_type_subject' %}">
                             {% csrf_token %}
                             <input type="hidden" name="typeId" value="{{ subject.typeId }}">
-                            <button type="submit" class="btn btn-primary delete-btn" style="background-color: red">Delete</button>
+                            <button type="submit" class="btn btn-primary delete-btn" style="background-color: red">Usuń</button>
                         </form>
                     </td>
                 </tr>

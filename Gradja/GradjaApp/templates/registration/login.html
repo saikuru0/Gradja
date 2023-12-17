@@ -1,11 +1,11 @@
 {% extends '../base.html' %}
 
-{% block title %} Login {% endblock %}
+{% block title %} Logowanie {% endblock %}
 {% block content %}
 <h2>Zaloguj</h2>
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Log In</button>
+  <button type="submit">Zaloguj</button>
 </form>
 {% endblock %}
