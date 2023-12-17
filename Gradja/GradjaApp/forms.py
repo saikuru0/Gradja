@@ -126,6 +126,10 @@ class AddClassForm(forms.ModelForm):
         model = Classes
         fields = ['className', 'homeroomTeacher', 'activeFrom', 'activeTo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['homeroomTeacher'].queryset = Users.objects.filter(groups__name='teacher')
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.classId = generate_unique_integer_id()
