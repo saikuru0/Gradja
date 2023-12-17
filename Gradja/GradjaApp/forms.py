@@ -154,6 +154,10 @@ class editClassForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ['className', 'homeroomTeacher', 'activeFrom', 'activeTo']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['homeroomTeacher'].queryset = Users.objects.filter(groups__name='teacher')
 
 
 
