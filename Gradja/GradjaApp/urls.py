@@ -19,4 +19,5 @@ urlpatterns = [
     path('set_class/', views.set_class, name='set_class'),
     path('add_class/', views.add_class, name='add_class'),
     path('edit_class/<int:class_id>/', views.edit_class, name='edit_class'),
+    path('add_one_grade',  views.add_one_grade, name='add_one_grade' ),
 ]

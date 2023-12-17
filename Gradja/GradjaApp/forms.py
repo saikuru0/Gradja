@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from GradjaApp.models import SubjectTypes
-from .models import ClassStudents, Classes, Users, Mails
+from .models import ClassStudents, Classes, Users, Mails, GradeType, GradeValue, Grades, SubjectTypes, Subjects
 import random, time
 
 class SignUpForm(UserCreationForm):
@@ -29,12 +28,59 @@ class editGradetypeForm(forms.Form):
     typeName = forms.CharField(max_length=100, label='Nazwa')
     weight = forms.DecimalField(label='Wartość')
 
-
-
 class SubjectChoice(forms.Form):
-    subjects = SubjectTypes.objects.all()
-    subjects_choices = [(subject.id, subject.nazwa) for subject in subjects]
-    choosen_subject = forms.ChoiceField(choices=subjects_choices)
+    chosen_subject = forms.ModelChoiceField(
+        queryset=Subjects.objects.all(),
+        label='Przedmiot'
+    )
+
+class AddOneGrade(forms.ModelForm):
+    gradeId = forms.IntegerField(widget=forms.HiddenInput())
+    classId = forms.ModelChoiceField(
+        queryset=Subjects.objects.all(),
+        label='Przedmiot',
+        widget=forms.HiddenInput()
+    )
+    studentId = forms.ModelChoiceField(
+        queryset=Users.objects.all(),
+        label='Student'
+    )
+
+    typeId = forms.ModelChoiceField(
+        queryset=GradeType.objects.all(),
+        empty_label=None,
+        label='Za co'
+    )
+
+    gradeValueId = forms.ModelChoiceField(
+        queryset=GradeValue.objects.all(),
+        empty_label=None,  # Bez opcji pustej
+        label='Ocena'
+    )
+
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 1, 'cols': 40}),  # Dostosuj liczność wierszy i kolumn
+        label='Opis'
+    )
+
+    class Meta:
+        model = Grades
+        fields = ('gradeId', 'classId', 'studentId', 'gradeValueId', 'typeId', 'description')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial['gradeId'] = generate_unique_integer_id()
+
+        if 'classId' in self.initial:
+            class_id = self.initial['classId'].classId
+            self.fields['studentId'].queryset = Users.objects.filter(
+                id__in=ClassStudents.objects.filter(classId=class_id).values('studentId')
+            )
+
 
 
 
