@@ -269,7 +269,7 @@ def add_class(request):
     return render(request, 'add_class.html', {'form': form})
 
 
-
+@user_with_required_group('admin')
 def edit_class(request, class_id):
     instance = get_object_or_404(Classes, classId=class_id)
 
