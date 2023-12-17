@@ -173,17 +173,19 @@ class AddStudentParentForm(forms.ModelForm):
         model = StudentParent
         fields = ['studentId', 'parentId']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['studentId'].queryset = Users.objects.filter(groups__name='student')
+        self.fields['parentId'].queryset = Users.objects.filter(groups__name='parent')
+
     def clean(self):
         cleaned_data = super().clean()
         student_id = cleaned_data.get('studentId')
         parent_id = cleaned_data.get('parentId')
 
-        if student_id and parent_id and student_id == parent_id:
-            raise ValidationError("ID ucznia i rodzica nie mogą być takie same.")
-
         existing_record = StudentParent.objects.filter(studentId=student_id, parentId=parent_id).exists()
         if existing_record:
-            raise ValidationError("Podane dane znajdują się już w bazie.")
+            raise forms.ValidationError("Podane dane znajdują się już w bazie.")
 
         return cleaned_data
 
@@ -192,7 +194,6 @@ class AddStudentParentForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
 
 
 
