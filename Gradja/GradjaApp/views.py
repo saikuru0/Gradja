@@ -1,5 +1,3 @@
-# from django.contrib import messages
-# from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -14,6 +12,7 @@ from .forms import SubjectTypeForm
 from .models import SubjectTypes
 from .models import Subjects
 from .forms import SubjectForm
+
 
 
 def home(request):
