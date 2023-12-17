@@ -4,14 +4,12 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .forms import AddClassForm, AddStudentParentForm, AssignStudentsForm, delClassForm, delStudentParentForm, editClassForm, SignUpForm, MailForm
-from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades
+from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades, Users, SubjectTypes
 from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm, AddOneGrade
 from .decorators import not_logged_in_required, user_with_required_group
-from .models import SubjectTypes
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
 from .forms import generate_unique_integer_id
-from .models import SubjectTypes
 from .forms import SubjectForm
 
 
@@ -41,7 +39,27 @@ def signup(request):
 def set_grades(request):
     return render(request, 'set_grades.html', {})
 
+def view_grades(request, selected_username=None):
+    user_id = request.user
+    if (selected_username is None):
+        selected = user_id
+        if (StudentParent.objects.filter(parentId=user_id).exists()):
+            return redirect('choose_child')
+    else:
+        selected = Users.objects.get(username=selected_username)
+    pops = StudentParent.objects.filter(parentId=user_id)
+    if (selected not in [user_id] + [pop.studentId for pop in pops]):
+        return redirect('view_grades')
+    grades = Grades.objects.filter(studentId=selected)
+    subjects = [grade.classId for grade in grades]
+    subject_grades = [(subject, [grade for grade in grades.filter(classId=subject)]) for subject in subjects]
+    return render(request, 'view_grades.html', {'sg': subject_grades})
 
+def choose_child(request):
+    user_id = request.user
+    pops = StudentParent.objects.filter(parentId=user_id)
+    children = [pop.studentId for pop in pops]
+    return render(request, 'choose_child.html', {'children': children})
 
 @user_with_required_group('admin')
 def set_type_subject(request):
