@@ -45,13 +45,30 @@ class SubjectForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['teacherId'].queryset = Users.objects.filter(groups__name='teacher')
 
-
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+    
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.subjectId = generate_unique_integer_id()
-        if commit:
-            instance.save()
-        return instance
+
+        if instance.pk:
+            existing_instance = Subjects.objects.get(pk=instance.pk)
+            existing_instance.classId = instance.classId
+            existing_instance.subjectType = instance.subjectType
+            existing_instance.teacherId = instance.teacherId
+            existing_instance.activeFrom = instance.activeFrom
+            existing_instance.activeTo = instance.activeTo
+
+            if commit:
+                existing_instance.save()
+            
+            return existing_instance
+        else:
+            instance.subjectId = generate_unique_integer_id()
+            if commit:
+                instance.save()
+            return instance
 
 
 
