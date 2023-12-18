@@ -41,6 +41,11 @@ class SubjectForm(ModelForm):
         model = Subjects
         fields = ['classId', 'subjectType', 'teacherId', 'activeFrom', 'activeTo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['teacherId'].queryset = Users.objects.filter(groups__name='teacher')
+
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.subjectId = generate_unique_integer_id()
