@@ -4,19 +4,35 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .forms import AddClassForm, AddStudentParentForm, AssignStudentsForm, delClassForm, delStudentParentForm, editClassForm, SignUpForm, MailForm
-from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades, Users, SubjectTypes
+from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades, Users, SubjectTypes, GradeValue
 from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm, AddOneGrade
 from .decorators import not_logged_in_required, user_with_required_group
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
 from .forms import generate_unique_integer_id
 from .forms import SubjectForm
+from .forms import ChangeGradeForm
 
 
 def home(request):
     return render(request, "home.html", {})
 
-
+def examine_grade(request, grade_id=None):
+    grade = get_object_or_404(Grades, gradeId=grade_id)
+    editable = True
+    if request.method == 'POST':
+        form = ChangeGradeForm(request.POST)
+        if form.is_valid():
+            try:
+                value = GradeValue.objects.get(gradeId=form.cleaned_data['ocena'])
+            except GradeValue.DoesNotExist:
+                value = GradeValue(gradeId=form.cleaned_data['ocena'], typeName="ebubu")
+                value.save()
+            grade.gradeValueId = value
+            grade.save()
+    else:
+        form = ChangeGradeForm(initial={'ocena': grade.gradeValueId.gradeId})
+    return render(request, 'examine_grade.html', {'grade': grade, 'editable': editable, 'form': form, 'gi': grade_id})
 
 @not_logged_in_required
 def signup(request):

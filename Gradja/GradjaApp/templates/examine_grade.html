@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %} Szczegóły oceny {% endblock %}
+
+{% block content %}
+  <h4>Szczegóły oceny</h4>
+  <form method="post" action="{% url 'examine_grade' grade_id=gi %}">
+  {% csrf_token %}
+  {% if editable %}
+    <p>Ocena: <span>{{ form.ocena }}</span></p>
+  {% else %}
+    <p>Ocena: {{ grade.gradeValueId.gradeId }}</p>
+  {% endif %}
+  <p>({{ grade.typeId.typeName }}, mnożnik x{{ grade.typeId.weight }})</p>
+  <p>Uczeń: {{ grade.studentId }}</p>
+  <p>Przedmiot: {{ grade.classId }}</p>
+  {% if editable %}
+    <button type="submit">Zapisz</button>
+  {% endif %}
+  </form>
+{% endblock %}
