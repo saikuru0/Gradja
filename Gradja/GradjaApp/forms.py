@@ -34,9 +34,19 @@ class SubjectTypeForm(ModelForm):
 
 
 class SubjectForm(ModelForm):
+    activeFrom = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label = 'Aktywna od')
+    activeTo = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label = 'Aktywna do')
+
     class Meta:
         model = Subjects
-        fields = '__all__'
+        fields = ['classId', 'subjectType', 'teacherId', 'activeFrom', 'activeTo']
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.subjectId = generate_unique_integer_id()
+        if commit:
+            instance.save()
+        return instance
 
 
 
