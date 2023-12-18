@@ -215,3 +215,7 @@ class AddStudentParentForm(forms.ModelForm):
 class delStudentParentForm(forms.Form):
     studentId = forms.CharField(widget=forms.HiddenInput())
     parentId = forms.CharField(widget=forms.HiddenInput())
+
+
+class ChangeGradeForm(forms.Form):
+     ocena = forms.FloatField(label='ocena')
