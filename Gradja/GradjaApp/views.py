@@ -19,7 +19,7 @@ def home(request):
 
 def examine_grade(request, grade_id=None):
     grade = get_object_or_404(Grades, gradeId=grade_id)
-    editable = True
+    editable = (request.user == grade.classId.teacherId or request.user == grade.classId.classId.homeroomTeacher)
     if request.method == 'POST':
         form = ChangeGradeForm(request.POST)
         if form.is_valid():
