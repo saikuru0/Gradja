@@ -18,6 +18,9 @@ from django.shortcuts import get_object_or_404
 
 from .models import Subjects
 from .forms import SubjectForm
+from .forms import ChangeGradeForm
+from django.shortcuts import render
+from .models import Subjects, Grades, Users
 
 
 def home(request):
@@ -41,8 +44,8 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 
-# Przyklad uzycia dekoratora -> do zmiany lub calkowitego usuniecia.
-@user_with_required_group('teacher')
+
+@user_with_required_group('admin')
 def set_grades(request):
     return render(request, 'set_grades.html', {})
 
@@ -278,3 +281,68 @@ def assign_students(request):
         form = AssignStudentsForm()
 
     return render(request, 'assign_students.html', {'form': form})
+
+
+@user_with_required_group('admin')
+def set_student_parent(request):
+    if request.method == 'POST':
+        postForm = delStudentParentForm(request.POST)
+        print("blablabla")
+        if postForm.is_valid():
+            student_id = postForm.cleaned_data['studentId']
+            parent_id = postForm.cleaned_data['parentId']
+            print('bla', student_id, parent_id)
+            student_parent = get_object_or_404(StudentParent, studentId=student_id, parentId=parent_id)
+            student_parent.delete()
+
+    student_parent = StudentParent.objects.all()
+    form = delStudentParentForm()
+    return render(request, 'set_student_parent.html', {'student_parent': student_parent, 'form': form})
+
+
+
+@user_with_required_group('admin')
+def add_student_parent(request):
+    if request.method == 'POST':
+        form = AddStudentParentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('set_student_parent')
+    else:
+        form = AddStudentParentForm()
+
+    return render(request, 'add_student_parent.html', {'form': form})
+
+
+
+@user_with_required_group('admin')
+def teacher_grades_view(request):
+    if request.method == 'GET':
+        subject_id = request.GET.get('subject_id')
+        if subject_id:
+            students_grades = {}
+            subject = Subjects.objects.get(subjectId=subject_id)
+            students = Users.objects.filter(studentId__classId=subject.classId)
+            
+            for student in students:
+                student_grades = Grades.objects.filter(studentId=student, classId=subject)
+                average = sum([grade.gradeValueId.gradeId for grade in student_grades]) / len(student_grades)
+                students_grades[student] = {'grades': student_grades, 'average': average}
+
+            return render(request, 'teacher_grades.html', {'students_grades': students_grades, 'subject': subject})
+
+    # List subjects taught by the logged-in teacher
+    teacher_subjects = Subjects.objects.filter(teacherId=request.user)
+    return render(request, 'select_subject.html', {'subjects': teacher_subjects})
+
+@user_with_required_group('admin')
+def homeroom_teacher_view(request):
+    user_id = request.user.id
+    homeroom_class = Classes.objects.filter(homeroomTeacher_id=user_id).first()
+
+    if homeroom_class:
+        subjects = Subjects.objects.filter(classId=homeroom_class)
+        return render(request, 'homeroom_teacher_view.html', {'subjects': subjects, 'class': homeroom_class})
+    else:
+        return render(request, 'no_homeroom.html')
+

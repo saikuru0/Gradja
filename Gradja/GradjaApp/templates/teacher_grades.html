@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-center mb-4">Oceny dla przedmiotu: {{ subject }}</h2>
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Student</th>
+                <th scope="col">Oceny</th>
+                <th scope="col">Średnia</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student, data in students_grades.items %}
+                <tr>
+                    <td>{{ student }}</td>
+                    <td>
+                        {% for grade in data.grades %}
+                            <!-- Link do edycji oceny -->
+                            <a href="{% url 'examine_grade' grade.gradeId %}" class="text-decoration-none">
+                                {{ grade.gradeValueId.gradeId }}
+                            </a>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ data.average }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

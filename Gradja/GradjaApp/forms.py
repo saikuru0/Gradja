@@ -55,8 +55,8 @@ class editGradetypeForm(forms.Form):
 
 class SubjectChoice(forms.Form):
     subjects = SubjectTypes.objects.all()
-    subjects_choices = [(subject.id, subject.nazwa) for subject in subjects]
-    choosen_subject = forms.ChoiceField(choices=subjects_choices)
+    subjects_choices = [(subject.typeId, subject.typeName) for subject in subjects]
+    chosen_subject = forms.ChoiceField(choices=subjects_choices, label='Przedmiot')
 
 
 
