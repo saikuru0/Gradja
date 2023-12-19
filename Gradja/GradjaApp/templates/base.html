@@ -41,10 +41,7 @@
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/grades">Oceny</a>
                         {% endif %}
                         {% if request.user|has_group:"admin" %}
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_student_parent">Przypisz rodziców do uczniów</a>
-                        {% endif %}
-                        {% if request.user|has_group:"teacher" %}
-                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_grades">Dodaj oceny</a>
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_student_parent">Przypisz rodziców do uczniów</a>
                         {% endif %}
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/inbox">Skrzynka pocztowa</a>
                     {% endif %}
