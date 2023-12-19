@@ -12,7 +12,7 @@
         <ul>
         {% for grade in el.1 %}
           <li>
-            {{ grade.gradeValueId.gradeId }} ({{grade.typeId.typeName}}, mnożnik x{{ grade.typeId.weight }}), Opis: {{ grade.description }}
+            <a href="/examine_grade/{{ grade.gradeId }}">{{ grade.gradeValueId }}</a> ({{grade.typeId}}) - {{ grade.description }}
           </li>
         {% endfor %}
         </ul>
