@@ -2,13 +2,14 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .forms import AddClassForm, AddStudentParentForm, AssignStudentsForm, delClassForm, delStudentParentForm, editClassForm, SignUpForm, MailForm
-from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades, Users, SubjectTypes, GradeValue
-from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm, AddOneGrade
+from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades, Users, SubjectTypes, GradeValue, ClassStudents
+from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm, AddOneGrade, AddGrade, GradeFormSet
 from .decorators import not_logged_in_required, user_with_required_group
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
 from .forms import generate_unique_integer_id
 from .forms import SubjectForm
+from django.forms import modelformset_factory, inlineformset_factory
 from .forms import ChangeGradeForm
 
 
@@ -239,8 +240,6 @@ def add_one_grade(request):
         form = AddOneGrade(request.POST)
         if form.is_valid():
             form.save()
-        else:
-            print(form.errors)
         return redirect('grades_choice')
 
     else:
@@ -250,6 +249,49 @@ def add_one_grade(request):
 
     context = {'form': form, 'selected_subject': selected_subject, }
     return render(request, "add_one_grade.html", context)
+
+
+def set_grades(request):
+    if request.method == 'POST':
+        print(request.POST)
+        form = AddGrade(request.POST)
+        if form.is_valid():
+            qd = request.POST.lists()
+            to_create = {}
+            for key, values in qd:
+                to_create[key] = values
+            print('Post', to_create)
+            grade_id = to_create['gradeId']
+            class_id = to_create['classId']
+            student_id = to_create['studentId']
+            grade_value_id = to_create['gradeValueId']
+            type_id = to_create['typeId']
+            description = to_create['description']
+            for i in range(len(grade_id)):
+                Grades.objects.create(
+                    gradeId=grade_id[i],
+                    classId=class_id[i],
+                    studentId=student_id[i],
+                    gradeValueId=grade_value_id[i],
+                    typeId=type_id[i],
+                    description=description[i]
+                )
+        return redirect('grades_choice')
+
+    else:
+        selected_subject = request.session.get('chosen_subject', None)
+        subject = Subjects.objects.filter(subjectId=selected_subject).first()
+
+        students = Users.objects.filter(
+                id__in=ClassStudents.objects.filter(classId=subject.classId).values('studentId')
+            )
+        formset = []
+        students_list = students.all()
+        for student in students_list:
+            formset.append({'form': AddGrade(initial={'gradeId': generate_unique_integer_id(), 'classId': subject, 'studentId': student}), 'student': student})
+
+
+    return render(request, 'set_grades.html', {'formset': formset})
 
 
 

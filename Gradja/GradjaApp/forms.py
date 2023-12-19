@@ -1,11 +1,16 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
+from django.forms import modelformset_factory, inlineformset_factory
 from .models import StudentParent, SubjectTypes
 from .models import ClassStudents, Classes, Users, Mails, GradeType, GradeValue, Grades, SubjectTypes, Subjects
 import random, time
 
-
+def generate_unique_integer_id():
+    timestamp = int(time.time())
+    random_number = random.randint(1000, 9999)
+    unique_id = int(f"{timestamp}{random_number}")
+    return unique_id
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30)
@@ -144,13 +149,59 @@ class AddOneGrade(forms.ModelForm):
                 id__in=ClassStudents.objects.filter(classId=class_id).values('studentId')
             )
 
+class AddGrade(forms.ModelForm):
+    gradeId = forms.IntegerField(widget=forms.HiddenInput(), initial=generate_unique_integer_id())
+    
+    classId = forms.ModelChoiceField(
+            queryset=Subjects.objects.all(),
+            widget=forms.HiddenInput(),
+        )
+
+    studentId = forms.ModelChoiceField(
+        queryset=Users.objects.all(),
+        label='Student',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})  # Pole tylko do odczytu
+    )
+
+    gradeValueId = forms.ModelChoiceField(
+        queryset=GradeValue.objects.all(),
+        empty_label=None,
+        label='Ocena'
+    )
+
+    typeId = forms.ModelChoiceField(
+        queryset=GradeType.objects.all(),
+        empty_label=None,
+        label='Za co'
+    )
+
+    description = forms.CharField(
+        widget=forms.TextInput(),  # Zmiana na TextInput
+        label='Opis'
+    )
+
+    class Meta:
+        model = Grades
+        fields = ('gradeId', 'classId', 'studentId', 'gradeValueId', 'typeId', 'description')
+
+GradeFormSet = modelformset_factory(Grades, form=AddGrade, extra=0)
+
+# AddGradeFormset = inlineformset_factory(Users, Grades, form=AddGrade, extra=1, can_delete=False)
+
+# class AddGradeFormset(AddGradeFormset):
+#     def __init__(self, *args, subject=None, students=None, **kwargs):
+#         super(AddGradeFormset, self).__init__(*args, **kwargs)
+
+#         for student in students:
+#             new_form = AddGrade(initial={'classId': subject, 'studentId': student})
+#             self.fields[f'student_{student.id}'] = new_form
+            
 
 
 class MailForm(forms.ModelForm):
     class Meta:
         model = Mails
         fields = ('toId', 'topic', 'mailText')
-
 
 
 class AddClassForm(forms.ModelForm):
@@ -172,13 +223,6 @@ class AddClassForm(forms.ModelForm):
             instance.save()
         return instance
 
-
-
-def generate_unique_integer_id():
-    timestamp = int(time.time())
-    random_number = random.randint(1000, 9999)
-    unique_id = int(f"{timestamp}{random_number}")
-    return unique_id
 
 
 
