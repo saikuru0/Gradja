@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %} Student-parent {% endblock %}
+{% block title %} Rodzice uczniów {% endblock %}
 
 {% block content %}
 
-    <h2>Student-parent</h2>
+    <h2>Rodzice uczniów</h2>
 
     <a href="{% url 'add_student_parent' %}" class="btn btn-success">Dodaj</a>
 
     <table class="table">
         <thead>
             <tr>
-                <th>student ID</th>
-                <th>parent ID</th>
+                <th>uczeń</th>
+                <th>rodzic</th>
             </tr>
         </thead>
         <tbody>

@@ -1,25 +1,38 @@
-# from django.contrib import messages
-# from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .forms import AddClassForm, AddStudentParentForm, AssignStudentsForm, delClassForm, delStudentParentForm, editClassForm, SignUpForm, MailForm
-from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades, Users, ClassStudents
+from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades, Users, SubjectTypes, GradeValue, ClassStudents
 from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm, AddOneGrade, AddGrade, GradeFormSet
 from .decorators import not_logged_in_required, user_with_required_group
-from .models import SubjectTypes
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
 from .forms import generate_unique_integer_id
-from .models import SubjectTypes
 from .forms import SubjectForm
 from django.forms import modelformset_factory, inlineformset_factory
+from .forms import ChangeGradeForm
+
 
 
 def home(request):
     return render(request, "home.html", {})
 
-
+def examine_grade(request, grade_id=None):
+    grade = get_object_or_404(Grades, gradeId=grade_id)
+    editable = (request.user == grade.classId.teacherId or request.user == grade.classId.classId.homeroomTeacher)
+    if request.method == 'POST':
+        form = ChangeGradeForm(request.POST)
+        if form.is_valid():
+            try:
+                value = GradeValue.objects.get(gradeId=form.cleaned_data['ocena'])
+            except GradeValue.DoesNotExist:
+                value = GradeValue(gradeId=form.cleaned_data['ocena'], typeName="ebubu")
+                value.save()
+            grade.gradeValueId = value
+            grade.save()
+    else:
+        form = ChangeGradeForm(initial={'ocena': grade.gradeValueId.gradeId})
+    return render(request, 'examine_grade.html', {'grade': grade, 'editable': editable, 'form': form, 'gi': grade_id})
 
 @not_logged_in_required
 def signup(request):
@@ -37,6 +50,32 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 
+
+@user_with_required_group('teacher')
+def set_grades(request):
+    return render(request, 'set_grades.html', {})
+
+def view_grades(request, selected_username=None):
+    user_id = request.user
+    if (selected_username is None):
+        selected = user_id
+        if (StudentParent.objects.filter(parentId=user_id).exists()):
+            return redirect('choose_child')
+    else:
+        selected = Users.objects.get(username=selected_username)
+    pops = StudentParent.objects.filter(parentId=user_id)
+    if (selected not in [user_id] + [pop.studentId for pop in pops]):
+        return redirect('view_grades')
+    grades = Grades.objects.filter(studentId=selected)
+    subjects = [grade.classId for grade in grades]
+    subject_grades = [(subject, [grade for grade in grades.filter(classId=subject)]) for subject in subjects]
+    return render(request, 'view_grades.html', {'sg': subject_grades})
+
+def choose_child(request):
+    user_id = request.user
+    pops = StudentParent.objects.filter(parentId=user_id)
+    children = [pop.studentId for pop in pops]
+    return render(request, 'choose_child.html', {'children': children})
 
 @user_with_required_group('admin')
 def set_type_subject(request):
@@ -306,7 +345,7 @@ def add_class(request):
     return render(request, 'add_class.html', {'form': form})
 
 
-
+@user_with_required_group('admin')
 def edit_class(request, class_id):
     instance = get_object_or_404(Classes, classId=class_id)
 

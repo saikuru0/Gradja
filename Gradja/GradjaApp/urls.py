@@ -28,5 +28,10 @@ urlpatterns = [
     path('set_student_parent/', views.set_student_parent, name='set_student_parent'),
     path('add_student_parent/', views.add_student_parent, name='add_student_parent'),
     path('add_one_grade',  views.add_one_grade, name='add_one_grade' ),
+    path('view_grades/', views.view_grades, name='view_grades'),
+    path('view_grades/<str:selected_username>/', views.view_grades, name='view_grades'),
+    path('choose_child/', views.choose_child, name='choose_child'),
+    path('examine_grade/<int:grade_id>/', views.examine_grade, name='examine_grade'),
+    path('examine_grade/', views.examine_grade, name='examine_grade'),
 ]
 
