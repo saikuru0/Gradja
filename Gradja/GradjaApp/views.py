@@ -64,8 +64,8 @@ def view_grades(request, selected_username=None):
     if (selected not in [user_id] + [pop.studentId for pop in pops]):
         return redirect('view_grades')
     grades = Grades.objects.filter(studentId=selected)
-    subjects = [grade.classId for grade in grades]
-    subject_grades = [(subject, [grade for grade in grades.filter(classId=subject)]) for subject in subjects]
+    subjects = list({grade.classId for grade in grades})
+    subject_grades = [[subject, [grade for grade in grades.filter(classId=subject)]] for subject in subjects]
     return render(request, 'view_grades.html', {'sg': subject_grades})
 
 def choose_child(request):
