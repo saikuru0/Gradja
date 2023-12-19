@@ -16,12 +16,15 @@
       </thead>
       <tbody>
         {% for form in formset %}
-          <tr>
-            <td>{{ form.studentId.value }}</td>
-            <td>{{ form.gradeValueId }}</td>
-            <td>{{ form.typeId }}</td>
-            <td>{{ form.description }}</td>
-          </tr>
+            {{ form.form.studentId.as_hidden }}
+            {{ form.form.gradeId.as_hidden }}
+            {{ form.form.classId.as_hidden }}
+            <tr>
+                <td>{{ form.student }}</td>
+                <td>{{ form.form.gradeValueId }}</td>
+                <td>{{ form.form.typeId }}</td>
+                <td>{{ form.form.description }}</td>
+            </tr>
         {% endfor %}
       </tbody>
     </table>

@@ -115,16 +115,12 @@ class AddOneGrade(forms.ModelForm):
             )
 
 class AddGrade(forms.ModelForm):
-    gradeId = forms.IntegerField(
-        initial=generate_unique_integer_id(),
-        widget=forms.HiddenInput(),
-        )
+    gradeId = forms.IntegerField(widget=forms.HiddenInput(), initial=generate_unique_integer_id())
     
     classId = forms.ModelChoiceField(
             queryset=Subjects.objects.all(),
             widget=forms.HiddenInput(),
         )
-
 
     studentId = forms.ModelChoiceField(
         queryset=Users.objects.all(),
@@ -152,6 +148,8 @@ class AddGrade(forms.ModelForm):
     class Meta:
         model = Grades
         fields = ('gradeId', 'classId', 'studentId', 'gradeValueId', 'typeId', 'description')
+
+GradeFormSet = modelformset_factory(Grades, form=AddGrade, extra=0)
 
 # AddGradeFormset = inlineformset_factory(Users, Grades, form=AddGrade, extra=1, can_delete=False)
 
