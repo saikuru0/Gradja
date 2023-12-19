@@ -293,5 +293,7 @@ class delStudentParentForm(forms.Form):
     parentId = forms.CharField(widget=forms.HiddenInput())
 
 
-class ChangeGradeForm(forms.Form):
-     ocena = forms.FloatField(label='ocena')
+class ChangeGradeForm(forms.ModelForm):
+    class Meta:
+        model = Grades
+        fields = ('gradeValueId', 'typeId', 'description')

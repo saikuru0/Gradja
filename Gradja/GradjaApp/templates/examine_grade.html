@@ -7,11 +7,14 @@
   <form method="post" action="{% url 'examine_grade' grade_id=gi %}">
   {% csrf_token %}
   {% if editable %}
-    <p>Ocena: <span>{{ form.ocena }}</span></p>
+    <p>Ocena: <span>{{ form.gradeValueId }}</span></p>
+    <p>Typ oceny: <span>{{ form.typeId }}</span></p>
+    <p>Opis: <span>{{ form.description }}</span></p>
   {% else %}
-    <p>Ocena: {{ grade.gradeValueId.gradeId }}</p>
+    <p>Ocena: {{ grade.gradeValueId }}</p>
+    <p>Typ oceny: {{ grade.typeId }}</p>
+    <p>Opis: {{ grade.description }}</p>
   {% endif %}
-  <p>({{ grade.typeId.typeName }}, mnożnik x{{ grade.typeId.weight }})</p>
   <p>Uczeń: {{ grade.studentId }}</p>
   <p>Przedmiot: {{ grade.classId }}</p>
   {% if editable %}

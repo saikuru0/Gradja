@@ -23,15 +23,12 @@ def examine_grade(request, grade_id=None):
     if request.method == 'POST':
         form = ChangeGradeForm(request.POST)
         if form.is_valid():
-            try:
-                value = GradeValue.objects.get(gradeId=form.cleaned_data['ocena'])
-            except GradeValue.DoesNotExist:
-                value = GradeValue(gradeId=form.cleaned_data['ocena'], typeName="ebubu")
-                value.save()
-            grade.gradeValueId = value
+            grade.gradeValueId = form.cleaned_data.get('gradeValueId')
+            grade.typeId = form.cleaned_data.get('typeId')
+            grade.description = form.cleaned_data.get('description')
             grade.save()
     else:
-        form = ChangeGradeForm(initial={'ocena': grade.gradeValueId.gradeId})
+        form = ChangeGradeForm(initial={'gradeValueId': grade.gradeValueId, 'typeId': grade.typeId, 'description': grade.description})
     return render(request, 'examine_grade.html', {'grade': grade, 'editable': editable, 'form': form, 'gi': grade_id})
 
 @not_logged_in_required
