@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %} Rodzice uczniów {% endblock %}
+
+{% block content %}
+
+    <h2>Rodzice uczniów</h2>
+
+    <a href="{% url 'add_student_parent' %}" class="btn btn-success">Dodaj</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>uczeń</th>
+                <th>rodzic</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sp in student_parent %}
+                <tr>
+                    <td>{{ sp.studentId }}</td>
+                    <td>{{ sp.parentId }}</td>
+                    <td>
+                        <form method="post" action="{% url 'set_student_parent' %}">
+                            {% csrf_token %}
+                                <input type="hidden" name="studentId" value="{{ sp.studentId.id }}">
+                                <input type="hidden" name="parentId" value="{{ sp.parentId.id }}">
+                            <button type="submit" class="btn btn-primary delete-btn" style="background-color: red">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

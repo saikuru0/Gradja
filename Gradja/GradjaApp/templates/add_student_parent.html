@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Przypisz rodzica do ucznia{% endblock %}
+
+{% block content %}
+
+  <h2>Przypisz rodzica do ucznia</h2>
+  
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Dodaj</button>
+  </form>
+
+{% endblock %}

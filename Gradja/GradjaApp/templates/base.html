@@ -8,21 +8,17 @@
         <meta name="description" content="" />
         <meta name="author" content="" />
         <title>{% block title %}Gradja{% endblock %}</title>
-        <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
-        <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     </head>
     <body>
         <div class="d-flex" id="wrapper">
-            <!-- Sidebar  (Tu dodajemy linki. Pamietac o wyifowaniu jezeli jakas grupa nie moze czegos zobaczyc.) -->
             <div class="border-end bg-white" id="sidebar-wrapper">
                 <div class="sidebar-heading border-bottom bg-light">Gradja Service</div>
                 <div class="list-group list-group-flush">
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/">Home</a>
                     {% if user.is_authenticated %}
-
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/admin">Panel admina</a>
                         {% endif %}
@@ -32,51 +28,46 @@
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/assign_students">Przypisz ucznia do klasy</a>
                         {% endif %}
-                        {% if request.user|has_group:"admin" %} 
-                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_type_subject">Subject Types</a>
-                         {% endif %}
-                        {% if request.user|has_group:"admin" %} 
-                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/subjects">Subjects</a>
-                         {% endif %}
+                        {% if request.user|has_group:"admin" %}
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_type_subject">Typy przedmiotów</a>
+                        {% endif %}
+                        {% if request.user|has_group:"admin" %}
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/subjects">Przedmioty</a>
+                        {% endif %}
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_gradetype">Dodaj typ oceny</a>
                         {% endif %}
                         {% if request.user|has_group:"admin" %}
                             <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/grades">Oceny</a>
                         {% endif %}
-                        {% if request.user|has_group:"teacher" %}
-                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_grades">Dodaj oceny</a>
+                        {% if request.user|has_group:"admin" %}
+                            <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/set_student_parent">Przypisz rodziców do uczniów</a>
                         {% endif %}
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/inbox">Mail</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" href="/inbox">Skrzynka pocztowa</a>
                     {% endif %}
                 </div>
             </div>
-            <!-- Page content wrapper-->
             <div id="page-content-wrapper">
-                <!-- Top navigation-->
                 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
                     <div class="container-fluid">
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
                                 {% if user.is_authenticated %}
-                               <li class="nav-item active"><a class="nav-link" href="/accounts/logout">Logout</a></li>
+                            <li class="nav-item active"><a class="nav-link" href="/accounts/logout">Logout</a></li>
                                 {% else %}
                                 <li class="nav-item active"><a class="nav-link" href="/accounts/login">Login</a></li>
                                 <li class="nav-item active"><a class="nav-link" href="/accounts/signup">Sign up</a></li>
-                               {% endif %}
+                            {% endif %}
                             </ul>
                         </div>
                     </div>
                 </nav>
-                <!-- Page content-->
                 <div class="container-fluid">
                     {% block content %}  {% endblock %}
                 </div>
             </div>
         </div>
-        <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Core theme JS-->
         <script src="{% static 'js/scripts.js' %}"></script>
     </body>
 </html>

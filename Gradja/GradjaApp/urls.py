@@ -6,7 +6,6 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('accounts/signup/', views.signup, name='signup'),
     path('set_grades/', views.set_grades, name='set_grades'),
-    path('add_class/', views.add_class, name='add_class'),
     path('assign_students/', views.assign_students, name='assign_students'),
     path('set_grades', views.set_grades, name='set_grades'),
     path('set_type_subject/', views.set_type_subject, name='set_type_subject'),
@@ -35,7 +34,6 @@ urlpatterns = [
     path('examine_grade/<int:grade_id>/', views.examine_grade, name='examine_grade'),
     path('examine_grade/', views.examine_grade, name='examine_grade'),
     path('teacher_grades/', views.teacher_grades_view, name='teacher_grades'),
-    path('examine_grade/<int:grade_id>/', views.examine_grade, name='examine_grade'),
     path('homeroom_teacher/', views.homeroom_teacher_view, name='homeroom_teacher_view'),
 ]
 

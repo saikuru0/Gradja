@@ -1,3 +1,4 @@
+<!-- grades_choice.html -->
 {% extends 'base.html' %}
 
 {% block title %} Oceny {% endblock %}
@@ -5,11 +6,14 @@
 {% block content %}
     <h2>Oceny</h2>
 
-    <form method="post" action="{% url 'grades' %}">
+    <form method="post" action="{% url 'grades_choice' %}">
         {% csrf_token %}
         {{ form }}
-        <br>
-        <button type="submit" class="btn btn-primary delete-btn" style="background-color: blue">Jeden uczeń</button>
+        <div class="form-field">
+            {{ form.typeName.label_tag }}
+            {{ form.typeName }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-success">Jeden uczeń</button>
         <button type="submit" class="btn btn-primary delete-btn" style="background-color: green">Wszyscy</button>
     </form>
 {% endblock %}

@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %} Set GradeType {% endblock %}
+{% block title %} Typy ocen {% endblock %}
 
 {% block content %}
 
-    <h2>Grades Table</h2>
+    <h2>Typy Ocen</h2>
 
     <a href="{% url 'add_gradetype' %}" class="btn btn-success">Dodaj</a>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Weight</th>
+                <th>Nazwa</th>
+                <th>Wartość</th>
             </tr>
         </thead>
         <tbody>

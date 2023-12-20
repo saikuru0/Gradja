@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2 style="margin-bottom: 30px;">Add subject type</h2>
+  <h2 style="margin-bottom: 30px;">Dodaj nowy typ oceny:</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Wyślij</button>
+    <button type="submit" class="btn btn-primary">Zapisz</button>
   </form>
 {% endblock %}
