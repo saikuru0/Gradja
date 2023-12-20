@@ -362,7 +362,7 @@ def add_student_parent(request):
     return render(request, 'add_student_parent.html', {'form': form})
 
 
-@user_with_required_group('admin')
+@user_with_required_group('admin', 'teacher')
 def teacher_grades_view(request):
     if request.method == 'GET':
         subject_id = request.GET.get('subject_id')
@@ -373,7 +373,10 @@ def teacher_grades_view(request):
             
             for student in students:
                 student_grades = Grades.objects.filter(studentId=student, classId=subject)
-                average = sum([grade.gradeValueId.gradeId for grade in student_grades]) / len(student_grades)
+                if len(student_grades) == 0:
+                    average = 1.
+                else:
+                    average = sum([grade.gradeValueId.gradeId for grade in student_grades]) / len(student_grades)
                 students_grades[student] = {'grades': student_grades, 'average': average}
 
             return render(request, 'teacher_grades.html', {'students_grades': students_grades, 'subject': subject})
@@ -382,7 +385,7 @@ def teacher_grades_view(request):
     teacher_subjects = Subjects.objects.filter(teacherId=request.user)
     return render(request, 'select_subject.html', {'subjects': teacher_subjects})
 
-@user_with_required_group('admin')
+@user_with_required_group('admin', 'teacher')
 def homeroom_teacher_view(request):
     user_id = request.user.id
     homeroom_class = Classes.objects.filter(homeroomTeacher_id=user_id).first()
