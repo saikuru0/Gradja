@@ -20,6 +20,7 @@ def examine_grade(request, grade_id=None):
     grade = get_object_or_404(Grades, gradeId=grade_id)
     editable = (request.user == grade.classId.teacherId)
     if request.method == 'POST':
+        ret_id = grade.classId.subjectId
         if 'delete' in request.POST:
             grade.delete()
         form = ChangeGradeForm(request.POST)
@@ -28,7 +29,7 @@ def examine_grade(request, grade_id=None):
             grade.typeId = form.cleaned_data.get('typeId')
             grade.description = form.cleaned_data.get('description')
             grade.save()
-        return redirect('teacher_grades')
+        return redirect(f"teacher_grades/?subject_id={ret_id}")
     else:
         form = ChangeGradeForm(initial={'gradeValueId': grade.gradeValueId, 'typeId': grade.typeId, 'description': grade.description})
     return render(request, 'examine_grade.html', {'grade': grade, 'editable': editable, 'form': form, 'gi': grade_id})
