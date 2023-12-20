@@ -33,5 +33,7 @@ urlpatterns = [
     path('choose_child/', views.choose_child, name='choose_child'),
     path('examine_grade/<int:grade_id>/', views.examine_grade, name='examine_grade'),
     path('examine_grade/', views.examine_grade, name='examine_grade'),
+    path('teacher_grades/', views.teacher_grades_view, name='teacher_grades'),
+    path('homeroom_teacher/', views.homeroom_teacher_view, name='homeroom_teacher_view'),
 ]
 

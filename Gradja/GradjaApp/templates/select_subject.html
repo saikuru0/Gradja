@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Wybierz przedmiot</h2>
+    <form action="" method="get" class="row justify-content-center">
+        <div class="col-12 mb-3">
+            <select name="subject_id" class="form-select">
+                {% for subject in subjects %}
+                    <option value="{{ subject.subjectId }}">{{ subject }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-12 mb-3">
+            <input type="submit" value="Wybierz" class="btn btn-primary btn-block">
+        </div>
+    </form>
+</div>
+{% endblock %}

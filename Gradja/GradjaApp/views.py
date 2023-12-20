@@ -13,7 +13,6 @@ from django.forms import modelformset_factory, inlineformset_factory
 from .forms import ChangeGradeForm
 
 
-
 def home(request):
     return render(request, "home.html", {})
 
@@ -48,7 +47,8 @@ def signup(request):
 
 
 
-@user_with_required_group('teacher')
+
+@user_with_required_group('teacher', 'admin')
 def set_grades(request):
     return render(request, 'set_grades.html', {})
 
@@ -248,48 +248,6 @@ def add_one_grade(request):
     return render(request, "add_one_grade.html", context)
 
 
-def set_grades(request):
-    if request.method == 'POST':
-        print(request.POST)
-        form = AddGrade(request.POST)
-        if form.is_valid():
-            qd = request.POST.lists()
-            to_create = {}
-            for key, values in qd:
-                to_create[key] = values
-            print('Post', to_create)
-            grade_id = to_create['gradeId']
-            class_id = to_create['classId']
-            student_id = to_create['studentId']
-            grade_value_id = to_create['gradeValueId']
-            type_id = to_create['typeId']
-            description = to_create['description']
-            for i in range(len(grade_id)):
-                Grades.objects.create(
-                    gradeId=grade_id[i],
-                    classId=class_id[i],
-                    studentId=student_id[i],
-                    gradeValueId=grade_value_id[i],
-                    typeId=type_id[i],
-                    description=description[i]
-                )
-        return redirect('grades_choice')
-
-    else:
-        selected_subject = request.session.get('chosen_subject', None)
-        subject = Subjects.objects.filter(subjectId=selected_subject).first()
-
-        students = Users.objects.filter(
-                id__in=ClassStudents.objects.filter(classId=subject.classId).values('studentId')
-            )
-        formset = []
-        students_list = students.all()
-        for student in students_list:
-            formset.append({'form': AddGrade(initial={'gradeId': generate_unique_integer_id(), 'classId': subject, 'studentId': student}), 'student': student})
-
-
-    return render(request, 'set_grades.html', {'formset': formset})
-
 
 
 def send_mail(request):
@@ -402,3 +360,36 @@ def add_student_parent(request):
         form = AddStudentParentForm()
 
     return render(request, 'add_student_parent.html', {'form': form})
+
+
+@user_with_required_group('admin')
+def teacher_grades_view(request):
+    if request.method == 'GET':
+        subject_id = request.GET.get('subject_id')
+        if subject_id:
+            students_grades = {}
+            subject = Subjects.objects.get(subjectId=subject_id)
+            students = Users.objects.filter(studentId__classId=subject.classId)
+            
+            for student in students:
+                student_grades = Grades.objects.filter(studentId=student, classId=subject)
+                average = sum([grade.gradeValueId.gradeId for grade in student_grades]) / len(student_grades)
+                students_grades[student] = {'grades': student_grades, 'average': average}
+
+            return render(request, 'teacher_grades.html', {'students_grades': students_grades, 'subject': subject})
+
+    # List subjects taught by the logged-in teacher
+    teacher_subjects = Subjects.objects.filter(teacherId=request.user)
+    return render(request, 'select_subject.html', {'subjects': teacher_subjects})
+
+@user_with_required_group('admin')
+def homeroom_teacher_view(request):
+    user_id = request.user.id
+    homeroom_class = Classes.objects.filter(homeroomTeacher_id=user_id).first()
+
+    if homeroom_class:
+        subjects = Subjects.objects.filter(classId=homeroom_class)
+        return render(request, 'homeroom_teacher_view.html', {'subjects': subjects, 'class': homeroom_class})
+    else:
+        return render(request, 'no_homeroom.html')
+

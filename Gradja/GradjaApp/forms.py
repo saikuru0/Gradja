@@ -184,6 +184,7 @@ class AddGrade(forms.ModelForm):
         model = Grades
         fields = ('gradeId', 'classId', 'studentId', 'gradeValueId', 'typeId', 'description')
 
+
 GradeFormSet = modelformset_factory(Grades, form=AddGrade, extra=0)
 
 # AddGradeFormset = inlineformset_factory(Users, Grades, form=AddGrade, extra=1, can_delete=False)
