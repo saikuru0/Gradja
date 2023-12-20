@@ -18,14 +18,17 @@ def home(request):
 
 def examine_grade(request, grade_id=None):
     grade = get_object_or_404(Grades, gradeId=grade_id)
-    editable = (request.user == grade.classId.teacherId or request.user == grade.classId.classId.homeroomTeacher)
+    editable = (request.user == grade.classId.teacherId)
     if request.method == 'POST':
+        if 'delete' in request.POST:
+            grade.delete()
         form = ChangeGradeForm(request.POST)
         if form.is_valid():
             grade.gradeValueId = form.cleaned_data.get('gradeValueId')
             grade.typeId = form.cleaned_data.get('typeId')
             grade.description = form.cleaned_data.get('description')
             grade.save()
+    return redirect('teacher_grade')
     else:
         form = ChangeGradeForm(initial={'gradeValueId': grade.gradeValueId, 'typeId': grade.typeId, 'description': grade.description})
     return render(request, 'examine_grade.html', {'grade': grade, 'editable': editable, 'form': form, 'gi': grade_id})
