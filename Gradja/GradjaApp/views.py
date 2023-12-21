@@ -366,7 +366,8 @@ def add_student_parent(request):
     return render(request, 'add_student_parent.html', {'form': form})
 
 
-@user_with_required_group('admin', 'teacher')
+
+@user_with_required_group('teacher')
 def teacher_grades_view(request):
     if request.method == 'GET':
         subject_id = request.GET.get('subject_id')
@@ -377,18 +378,18 @@ def teacher_grades_view(request):
             
             for student in students:
                 student_grades = Grades.objects.filter(studentId=student, classId=subject)
-                if len(student_grades) == 0:
-                    average = 1.
-                else:
+                if student_grades.exists():
                     average = sum([grade.gradeValueId.gradeId for grade in student_grades]) / len(student_grades)
+                else:
+                    average = 1.0
                 students_grades[student] = {'grades': student_grades, 'average': average}
 
             return render(request, 'teacher_grades.html', {'students_grades': students_grades, 'subject': subject})
-
     # List subjects taught by the logged-in teacher
     teacher_subjects = Subjects.objects.filter(teacherId=request.user)
     return render(request, 'select_subject.html', {'subjects': teacher_subjects})
 
+  
 @user_with_required_group('admin', 'teacher')
 def homeroom_teacher_view(request):
     user_id = request.user.id
@@ -396,7 +397,19 @@ def homeroom_teacher_view(request):
 
     if homeroom_class:
         subjects = Subjects.objects.filter(classId=homeroom_class)
-        return render(request, 'homeroom_teacher_view.html', {'subjects': subjects, 'class': homeroom_class})
+        subjects_grades = {}
+        for subject in subjects:
+            grades = Grades.objects.filter(classId=subject)
+            subjects_grades[subject] = grades
+
+        return render(request, 'homeroom_teacher_view.html', {'subjects_grades': subjects_grades, 'class': homeroom_class})
     else:
         return render(request, 'no_homeroom.html')
 
+@user_with_required_group('teacher', 'admin')
+def grades_view(request, subject_id):
+    subject = get_object_or_404(Subjects, subjectId=subject_id)
+
+    grades = Grades.objects.filter(classId=subject)
+
+    return render(request, 'grades_view.html', {'grades': grades, 'subject': subject})

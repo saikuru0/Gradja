@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Oceny dla przedmiotu: {{ subject.subjectType.typeName }}</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID Oceny</th>
+                <th>Wartość Oceny</th>
+                <th>Typ Oceny</th>
+                <th>Opis</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+            <tr>
+                <td>{{ grade.gradeId }}</td>
+                <td>{{ grade.gradeValueId.typeName }}</td>
+                <td>{{ grade.typeId.typeName }}</td>
+                <td>{{ grade.description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
