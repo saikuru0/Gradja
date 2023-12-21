@@ -18,14 +18,18 @@ def home(request):
 
 def examine_grade(request, grade_id=None):
     grade = get_object_or_404(Grades, gradeId=grade_id)
-    editable = (request.user == grade.classId.teacherId or request.user == grade.classId.classId.homeroomTeacher)
+    editable = (request.user == grade.classId.teacherId)
     if request.method == 'POST':
+        ret_id = grade.classId.subjectId
+        if 'delete' in request.POST:
+            grade.delete()
         form = ChangeGradeForm(request.POST)
         if form.is_valid():
             grade.gradeValueId = form.cleaned_data.get('gradeValueId')
             grade.typeId = form.cleaned_data.get('typeId')
             grade.description = form.cleaned_data.get('description')
             grade.save()
+        return redirect(f"teacher_grades/?subject_id={ret_id}")
     else:
         form = ChangeGradeForm(initial={'gradeValueId': grade.gradeValueId, 'typeId': grade.typeId, 'description': grade.description})
     return render(request, 'examine_grade.html', {'grade': grade, 'editable': editable, 'form': form, 'gi': grade_id})
@@ -362,6 +366,7 @@ def add_student_parent(request):
     return render(request, 'add_student_parent.html', {'form': form})
 
 
+
 @user_with_required_group('teacher')
 def teacher_grades_view(request):
     if request.method == 'GET':
@@ -376,12 +381,16 @@ def teacher_grades_view(request):
                 if student_grades.exists():
                     average = sum([grade.gradeValueId.gradeId for grade in student_grades]) / len(student_grades)
                 else:
-                    average = None
+                    average = 1.0
                 students_grades[student] = {'grades': student_grades, 'average': average}
 
             return render(request, 'teacher_grades.html', {'students_grades': students_grades, 'subject': subject})
+    # List subjects taught by the logged-in teacher
+    teacher_subjects = Subjects.objects.filter(teacherId=request.user)
+    return render(request, 'select_subject.html', {'subjects': teacher_subjects})
 
-@user_with_required_group('teacher', 'admin')
+  
+@user_with_required_group('admin', 'teacher')
 def homeroom_teacher_view(request):
     user_id = request.user.id
     homeroom_class = Classes.objects.filter(homeroomTeacher_id=user_id).first()

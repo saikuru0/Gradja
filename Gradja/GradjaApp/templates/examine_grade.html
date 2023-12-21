@@ -21,4 +21,10 @@
     <button type="submit">Zapisz</button>
   {% endif %}
   </form>
+  {% if editable %}
+    <form method="post" action="{% url 'examine_grade' grade_id=gi %}">
+      {% csrf_token %}
+      <button type="submit" name="delete">Usuń ocenę</button>
+    </form>
+  {% endif %}
 {% endblock %}
