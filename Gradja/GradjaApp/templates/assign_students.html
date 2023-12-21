@@ -3,13 +3,17 @@
 {% block title %} Przypisz ucznia {% endblock %}
 
 {% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Przypisz ucznia do klasy</h2>
 
-<h2>Przypisz ucznia do klasy</h2>
-
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Zapisz</button>
-</form>
-
+    <form method="post" enctype="multipart/form-data" class="row justify-content-center">
+      {% csrf_token %}
+      <div class="col-12 mb-3">
+        {{ form.as_p }}
+      </div>
+      <div class="col-12 mb-3">
+        <button type="submit" class="btn btn-primary">Zapisz</button>
+      </div>
+    </form>
+</div>
 {% endblock %}

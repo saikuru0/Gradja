@@ -1,19 +1,19 @@
-<!-- grades_choice.html -->
 {% extends 'base.html' %}
 
 {% block title %} Oceny {% endblock %}
 
 {% block content %}
-    <h2>Oceny</h2>
+    <div class="container mt-5 text-center">
+        <h2 class="mb-4">Oceny</h2>
 
-    <form method="post" action="{% url 'grades_choice' %}">
+    <form method="post" action="{% url 'grades_choice' %}" class="form-inline">
         {% csrf_token %}
         {{ form }}
-        <div class="form-field">
+        <div class="form-group mx-sm-3 mb-2">
             {{ form.typeName.label_tag }}
             {{ form.typeName }}
         </div>
-        <button type="submit" class="btn btn-primary btn-success">Jeden uczeń</button>
-        <button type="submit" class="btn btn-primary delete-btn" style="background-color: green">Wszyscy</button>
+        <button type="submit" class="btn btn-primary btn-success mb-2">Wybierz przedmiot</button>
     </form>
+    </div>
 {% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %} Oceny {% endblock %}
+
+{% block content %}
+  <h2 class="display-4">Sprawdź oceny dziecka</h2>
+  {% if children %}
+    <ul>
+    {% for child in children %}
+      <li><a href="/view_grades/{{ child.username }}">{{ child }}</a></li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>no kids ._O</p>
+  {% endif %}
+{% endblock %}

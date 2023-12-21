@@ -1,13 +1,16 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm
+from django.forms import modelformset_factory, inlineformset_factory
 from .models import StudentParent, SubjectTypes
 from .models import ClassStudents, Classes, Users, Mails, GradeType, GradeValue, Grades, SubjectTypes, Subjects
-
 import random, time
-from django.core.exceptions import ValidationError
 
-
+def generate_unique_integer_id():
+    timestamp = int(time.time())
+    random_number = random.randint(1000, 9999)
+    unique_id = int(f"{timestamp}{random_number}")
+    return unique_id
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30)
@@ -20,8 +23,8 @@ class SignUpForm(UserCreationForm):
 
 
 class DelSubjectTypeForm(forms.Form):
-    typeId = forms.IntegerField(help_text="Enter the ID of the subject type to delete")
-    
+    typeId = forms.IntegerField(help_text="Wpisz ID przedmiotu do usunięcia.")
+
 
 
 class SubjectTypeForm(ModelForm):
@@ -32,12 +35,45 @@ class SubjectTypeForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(SubjectTypeForm, self).__init__(*args, **kwargs)
         self.fields['typeId'].widget = forms.HiddenInput()
-    
-        
+
+
+
 class SubjectForm(ModelForm):
+    activeFrom = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label = 'Aktywna od')
+    activeTo = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label = 'Aktywna do')
+
     class Meta:
         model = Subjects
-        fields = '__all__'
+        fields = ['classId', 'subjectType', 'teacherId', 'activeFrom', 'activeTo']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['teacherId'].queryset = Users.objects.filter(groups__name='teacher')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        if instance.pk:
+            existing_instance = Subjects.objects.get(pk=instance.pk)
+            existing_instance.classId = instance.classId
+            existing_instance.subjectType = instance.subjectType
+            existing_instance.teacherId = instance.teacherId
+            existing_instance.activeFrom = instance.activeFrom
+            existing_instance.activeTo = instance.activeTo
+
+            if commit:
+                existing_instance.save()
+            
+            return existing_instance
+        else:
+            instance.subjectId = generate_unique_integer_id()
+            if commit:
+                instance.save()
+            return instance
 
 
 
@@ -56,11 +92,24 @@ class editGradetypeForm(forms.Form):
     typeName = forms.CharField(max_length=100, label='Nazwa')
     weight = forms.DecimalField(label='Wartość')
 
+
+
+
 class SubjectChoice(forms.Form):
+    def __init__(self, *args, user_id=None, **kwargs):
+        super(SubjectChoice, self).__init__(*args, **kwargs)
+
+        # Modyfikuj zapytanie do bazy danych, aby szukać Subjects po teacherId, jeśli user_id jest dostarczone
+        if user_id:
+            self.fields['chosen_subject'].queryset = Subjects.objects.filter(teacherId=user_id)
+
     chosen_subject = forms.ModelChoiceField(
         queryset=Subjects.objects.all(),
         label='Przedmiot'
     )
+
+
+
 
 class AddOneGrade(forms.ModelForm):
     gradeId = forms.IntegerField(widget=forms.HiddenInput())
@@ -109,13 +158,60 @@ class AddOneGrade(forms.ModelForm):
                 id__in=ClassStudents.objects.filter(classId=class_id).values('studentId')
             )
 
+class AddGrade(forms.ModelForm):
+    gradeId = forms.IntegerField(widget=forms.HiddenInput(), initial=generate_unique_integer_id())
+    
+    classId = forms.ModelChoiceField(
+            queryset=Subjects.objects.all(),
+            widget=forms.HiddenInput(),
+        )
+
+    studentId = forms.ModelChoiceField(
+        queryset=Users.objects.all(),
+        label='Student',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})  # Pole tylko do odczytu
+    )
+
+    gradeValueId = forms.ModelChoiceField(
+        queryset=GradeValue.objects.all(),
+        empty_label=None,
+        label='Ocena'
+    )
+
+    typeId = forms.ModelChoiceField(
+        queryset=GradeType.objects.all(),
+        empty_label=None,
+        label='Za co'
+    )
+
+    description = forms.CharField(
+        widget=forms.TextInput(),  # Zmiana na TextInput
+        label='Opis'
+    )
+
+    class Meta:
+        model = Grades
+        fields = ('gradeId', 'classId', 'studentId', 'gradeValueId', 'typeId', 'description')
+
+
+GradeFormSet = modelformset_factory(Grades, form=AddGrade, extra=0)
+
+# AddGradeFormset = inlineformset_factory(Users, Grades, form=AddGrade, extra=1, can_delete=False)
+
+# class AddGradeFormset(AddGradeFormset):
+#     def __init__(self, *args, subject=None, students=None, **kwargs):
+#         super(AddGradeFormset, self).__init__(*args, **kwargs)
+
+#         for student in students:
+#             new_form = AddGrade(initial={'classId': subject, 'studentId': student})
+#             self.fields[f'student_{student.id}'] = new_form
+            
 
 
 class MailForm(forms.ModelForm):
     class Meta:
         model = Mails
         fields = ('toId', 'topic', 'mailText')
-
 
 
 class AddClassForm(forms.ModelForm):
@@ -126,6 +222,10 @@ class AddClassForm(forms.ModelForm):
         model = Classes
         fields = ['className', 'homeroomTeacher', 'activeFrom', 'activeTo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['homeroomTeacher'].queryset = Users.objects.filter(groups__name='teacher')
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.classId = generate_unique_integer_id()
@@ -133,13 +233,6 @@ class AddClassForm(forms.ModelForm):
             instance.save()
         return instance
 
-
-
-def generate_unique_integer_id():
-    timestamp = int(time.time())
-    random_number = random.randint(1000, 9999)
-    unique_id = int(f"{timestamp}{random_number}")
-    return unique_id
 
 
 
@@ -150,6 +243,10 @@ class editClassForm(forms.ModelForm):
     class Meta:
         model = Classes
         fields = ['className', 'homeroomTeacher', 'activeFrom', 'activeTo']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['homeroomTeacher'].queryset = Users.objects.filter(groups__name='teacher')
 
 
 
@@ -166,6 +263,10 @@ class AssignStudentsForm(forms.ModelForm):
         model = ClassStudents
         fields = ['studentId', 'classId', 'activeFrom', 'activeTo']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['studentId'].queryset = Users.objects.filter(groups__name='student')
+
 
 
 class AddStudentParentForm(forms.ModelForm):
@@ -173,17 +274,19 @@ class AddStudentParentForm(forms.ModelForm):
         model = StudentParent
         fields = ['studentId', 'parentId']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['studentId'].queryset = Users.objects.filter(groups__name='student')
+        self.fields['parentId'].queryset = Users.objects.filter(groups__name='parent')
+
     def clean(self):
         cleaned_data = super().clean()
         student_id = cleaned_data.get('studentId')
         parent_id = cleaned_data.get('parentId')
 
-        if student_id and parent_id and student_id == parent_id:
-            raise ValidationError("Student ID and Parent ID cannot be the same.")
-
         existing_record = StudentParent.objects.filter(studentId=student_id, parentId=parent_id).exists()
         if existing_record:
-            raise ValidationError("This combination of Student ID and Parent ID already exists.")
+            raise forms.ValidationError("Podane dane znajdują się już w bazie.")
 
         return cleaned_data
 
@@ -195,7 +298,12 @@ class AddStudentParentForm(forms.ModelForm):
 
 
 
-
 class delStudentParentForm(forms.Form):
     studentId = forms.CharField(widget=forms.HiddenInput())
     parentId = forms.CharField(widget=forms.HiddenInput())
+
+
+class ChangeGradeForm(forms.ModelForm):
+    class Meta:
+        model = Grades
+        fields = ('gradeValueId', 'typeId', 'description')

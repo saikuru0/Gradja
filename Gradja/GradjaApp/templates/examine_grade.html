@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %} Szczegóły oceny {% endblock %}
+
+{% block content %}
+  <h4>Szczegóły oceny</h4>
+  <form method="post" action="{% url 'examine_grade' grade_id=gi %}">
+  {% csrf_token %}
+  {% if editable %}
+    <p>Ocena: <span>{{ form.gradeValueId }}</span></p>
+    <p>Typ oceny: <span>{{ form.typeId }}</span></p>
+    <p>Opis: <span>{{ form.description }}</span></p>
+  {% else %}
+    <p>Ocena: {{ grade.gradeValueId }}</p>
+    <p>Typ oceny: {{ grade.typeId }}</p>
+    <p>Opis: {{ grade.description }}</p>
+  {% endif %}
+  <p>Uczeń: {{ grade.studentId }}</p>
+  <p>Przedmiot: {{ grade.classId }}</p>
+  {% if editable %}
+    <button type="submit">Zapisz</button>
+  {% endif %}
+  </form>
+  {% if editable %}
+    <form method="post" action="{% url 'examine_grade' grade_id=gi %}">
+      {% csrf_token %}
+      <button type="submit" name="delete">Usuń ocenę</button>
+    </form>
+  {% endif %}
+{% endblock %}

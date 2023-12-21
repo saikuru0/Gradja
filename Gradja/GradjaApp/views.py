@@ -1,24 +1,38 @@
-# from django.contrib import messages
-# from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .forms import AddClassForm, AddStudentParentForm, AssignStudentsForm, delClassForm, delStudentParentForm, editClassForm, SignUpForm, MailForm
-from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades
-from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm, AddOneGrade
+from .models import Mails, GradeType, Classes, SubjectTypes, Subjects, StudentParent, Grades, Users, SubjectTypes, GradeValue, ClassStudents
+from .forms import delGradetypeForm, editGradetypeForm, SubjectChoice, addGradetypeForm, AddOneGrade, AddGrade, GradeFormSet
 from .decorators import not_logged_in_required, user_with_required_group
-from .models import SubjectTypes
 from .forms import DelSubjectTypeForm
 from .forms import SubjectTypeForm
 from .forms import generate_unique_integer_id
-from .models import SubjectTypes
 from .forms import SubjectForm
+from django.forms import modelformset_factory, inlineformset_factory
+from .forms import ChangeGradeForm
 
 
 def home(request):
     return render(request, "home.html", {})
 
-
+def examine_grade(request, grade_id=None):
+    grade = get_object_or_404(Grades, gradeId=grade_id)
+    editable = (request.user == grade.classId.teacherId)
+    if request.method == 'POST':
+        ret_id = grade.classId.subjectId
+        if 'delete' in request.POST:
+            grade.delete()
+        form = ChangeGradeForm(request.POST)
+        if form.is_valid():
+            grade.gradeValueId = form.cleaned_data.get('gradeValueId')
+            grade.typeId = form.cleaned_data.get('typeId')
+            grade.description = form.cleaned_data.get('description')
+            grade.save()
+        return redirect(f"/teacher_grades/?subject_id={ret_id}")
+    else:
+        form = ChangeGradeForm(initial={'gradeValueId': grade.gradeValueId, 'typeId': grade.typeId, 'description': grade.description})
+    return render(request, 'examine_grade.html', {'grade': grade, 'editable': editable, 'form': form, 'gi': grade_id})
 
 @not_logged_in_required
 def signup(request):
@@ -37,11 +51,32 @@ def signup(request):
 
 
 
-@user_with_required_group('teacher')
+
+@user_with_required_group('teacher', 'admin')
 def set_grades(request):
     return render(request, 'set_grades.html', {})
 
+def view_grades(request, selected_username=None):
+    user_id = request.user
+    if (selected_username is None):
+        selected = user_id
+        if (StudentParent.objects.filter(parentId=user_id).exists()):
+            return redirect('choose_child')
+    else:
+        selected = Users.objects.get(username=selected_username)
+    pops = StudentParent.objects.filter(parentId=user_id)
+    if (selected not in [user_id] + [pop.studentId for pop in pops]):
+        return redirect('view_grades')
+    grades = Grades.objects.filter(studentId=selected)
+    subjects = list({grade.classId for grade in grades})
+    subject_grades = [[subject, [grade for grade in grades.filter(classId=subject)]] for subject in subjects]
+    return render(request, 'view_grades.html', {'sg': subject_grades})
 
+def choose_child(request):
+    user_id = request.user
+    pops = StudentParent.objects.filter(parentId=user_id)
+    children = [pop.studentId for pop in pops]
+    return render(request, 'choose_child.html', {'children': children})
 
 @user_with_required_group('admin')
 def set_type_subject(request):
@@ -196,7 +231,7 @@ def add_grade_subject_choice(request):
             request.session['chosen_subject'] = selected_subject
             return redirect('add_one_grade')
     else:
-        form = SubjectChoice()
+        form = SubjectChoice(user_id=request.user)
 
     return render(request, 'grades_choice.html', {'form': form})
 
@@ -206,8 +241,6 @@ def add_one_grade(request):
         form = AddOneGrade(request.POST)
         if form.is_valid():
             form.save()
-        else:
-            print(form.errors)
         return redirect('grades_choice')
 
     else:
@@ -217,6 +250,7 @@ def add_one_grade(request):
 
     context = {'form': form, 'selected_subject': selected_subject, }
     return render(request, "add_one_grade.html", context)
+
 
 
 
@@ -270,7 +304,7 @@ def add_class(request):
     return render(request, 'add_class.html', {'form': form})
 
 
-
+@user_with_required_group('admin')
 def edit_class(request, class_id):
     instance = get_object_or_404(Classes, classId=class_id)
 
@@ -330,3 +364,57 @@ def add_student_parent(request):
         form = AddStudentParentForm()
 
     return render(request, 'add_student_parent.html', {'form': form})
+
+
+
+@user_with_required_group('teacher')
+def teacher_grades_view(request):
+    if request.method == 'GET':
+        subject_id = request.GET.get('subject_id')
+        if subject_id:
+            students_grades = {}
+            subject = Subjects.objects.get(subjectId=subject_id)
+            students = Users.objects.filter(studentId__classId=subject.classId)
+            
+            for student in students:
+                student_grades = Grades.objects.filter(studentId=student, classId=subject)
+                if student_grades.exists():
+                    average = 0
+                    weight = 0
+                    for grade in student_grades:
+                        average += grade.gradeValueId.gradeId * grade.typeId.weight
+                        weight += grade.typeId.weight
+                    average /= weight
+                else:
+                    average = 1.0
+                students_grades[student] = {'grades': student_grades, 'average': round(average, 2)}
+
+            return render(request, 'teacher_grades.html', {'students_grades': students_grades, 'subject': subject})
+    # List subjects taught by the logged-in teacher
+    teacher_subjects = Subjects.objects.filter(teacherId=request.user)
+    return render(request, 'select_subject.html', {'subjects': teacher_subjects})
+
+  
+@user_with_required_group('admin', 'teacher')
+def homeroom_teacher_view(request):
+    user_id = request.user.id
+    homeroom_class = Classes.objects.filter(homeroomTeacher_id=user_id).first()
+
+    if homeroom_class:
+        subjects = Subjects.objects.filter(classId=homeroom_class)
+        subjects_grades = {}
+        for subject in subjects:
+            grades = Grades.objects.filter(classId=subject)
+            subjects_grades[subject] = grades
+
+        return render(request, 'homeroom_teacher_view.html', {'subjects_grades': subjects_grades, 'class': homeroom_class})
+    else:
+        return render(request, 'no_homeroom.html')
+
+@user_with_required_group('teacher', 'admin')
+def grades_view(request, subject_id):
+    subject = get_object_or_404(Subjects, subjectId=subject_id)
+
+    grades = Grades.objects.filter(classId=subject)
+
+    return render(request, 'grades_view.html', {'grades': grades, 'subject': subject})

@@ -3,8 +3,10 @@
 {% block title %} Oceny {% endblock %}
 
 {% block content %}
-    <h2>Oceny</h2>
+    <div class="container mt-5 text-center">
+        <h2 class="mb-4">Oceny</h2>
 
-    <button type="submit" class="btn btn-primary delete-btn" style="background-color: blue">Zobacz</button>
-    <a href="{% url 'grades_choice' %}" class="btn btn-primary btn-success">Dodaj</a>
+        <a href="{% url 'teacher_grades' %}" class="btn btn-primary btn-lg mr-3">Zobacz</a>
+        <a href="{% url 'grades_choice' %}" class="btn btn-secondary btn-lg">Dodaj</a>
+    </div>
 {% endblock %}
