@@ -94,11 +94,20 @@ class editGradetypeForm(forms.Form):
 
 
 
+
 class SubjectChoice(forms.Form):
+    def __init__(self, *args, user_id=None, **kwargs):
+        super(SubjectChoice, self).__init__(*args, **kwargs)
+
+        # Modyfikuj zapytanie do bazy danych, aby szukać Subjects po teacherId, jeśli user_id jest dostarczone
+        if user_id:
+            self.fields['chosen_subject'].queryset = Subjects.objects.filter(teacherId=user_id)
+
     chosen_subject = forms.ModelChoiceField(
         queryset=Subjects.objects.all(),
         label='Przedmiot'
     )
+
 
 
 

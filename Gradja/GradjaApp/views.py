@@ -231,7 +231,7 @@ def add_grade_subject_choice(request):
             request.session['chosen_subject'] = selected_subject
             return redirect('add_one_grade')
     else:
-        form = SubjectChoice()
+        form = SubjectChoice(user_id=request.user)
 
     return render(request, 'grades_choice.html', {'form': form})
 
@@ -379,10 +379,15 @@ def teacher_grades_view(request):
             for student in students:
                 student_grades = Grades.objects.filter(studentId=student, classId=subject)
                 if student_grades.exists():
-                    average = sum([grade.gradeValueId.gradeId for grade in student_grades]) / len(student_grades)
+                    average = 0
+                    weight = 0
+                    for grade in student_grades:
+                        average += grade.gradeValueId.gradeId * grade.typeId.weight
+                        weight += grade.typeId.weight
+                    average /= weight
                 else:
                     average = 1.0
-                students_grades[student] = {'grades': student_grades, 'average': average}
+                students_grades[student] = {'grades': student_grades, 'average': round(average, 2)}
 
             return render(request, 'teacher_grades.html', {'students_grades': students_grades, 'subject': subject})
     # List subjects taught by the logged-in teacher
