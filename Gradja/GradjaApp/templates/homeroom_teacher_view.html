@@ -14,16 +14,21 @@
                     <th>Nauczyciel</th>
                     <th>Aktywny od</th>
                     <th>Aktywny do</th>
+                    <th>Akcje</th>
                 </tr>
             </thead>
             <tbody>
-                {% for subject in subjects %}
+                {% for subject, grades in subjects_grades.items %}
                 <tr>
                     <td>{{ subject.subjectType }}</td>
                     <td>{{ subject.subjectType.typeName }}</td>
                     <td>{{ subject.teacherId.first_name }} {{ subject.teacherId.last_name }}</td>
                     <td>{{ subject.activeFrom }}</td>
                     <td>{{ subject.activeTo }}</td>
+                    <td>
+                        <!-- Zmiana adresu URL na odpowiedni dla teacher_grades -->
+                        <a href="{% url 'teacher_grades' %}?subject_id={{ subject.subjectId }}" class="btn btn-primary">Zobacz oceny</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

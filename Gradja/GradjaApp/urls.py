@@ -35,5 +35,6 @@ urlpatterns = [
     path('examine_grade/', views.examine_grade, name='examine_grade'),
     path('teacher_grades/', views.teacher_grades_view, name='teacher_grades'),
     path('homeroom_teacher/', views.homeroom_teacher_view, name='homeroom_teacher_view'),
+    path('grades/<int:subject_id>/', views.grades_view, name='grades_view'),
 ]
 
